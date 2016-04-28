@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Render">
+      <UniqueIdentifier>{841a0ae5-6b3e-45c5-a2b1-a38a30bc282c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Render">
+      <UniqueIdentifier>{f5314912-fc82-44ea-a58b-3343e429b157}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{2e32fe26-bfd9-47af-ba85-3a63806eca03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{6d4c7787-06a8-4608-95b2-d78f6fe41b3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AABBTree">
+      <UniqueIdentifier>{bfee49d3-b40f-4cae-af87-62ef98d9cc9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AABBTree">
+      <UniqueIdentifier>{5ff99d20-03e9-4264-aeaa-24e340bf8339}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\GLSL">
+      <UniqueIdentifier>{91b6338b-45a4-4b72-831e-e888b4b02a6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{f61b6ca8-7d1c-4803-a9c6-3427fc1000a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{2c1c790d-6a2c-425a-8c62-bbb6b956b2b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PBD">
+      <UniqueIdentifier>{3cb53d77-e89d-41a1-a012-cd35fecd01ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PBD">
+      <UniqueIdentifier>{da0da3fc-1ee7-4aaf-8062-e79a28a25c07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaraffDynamics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaraffMPCGSolver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaraffPhysics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Simulator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\EventManager.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Mesh.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Model.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\ResourceManager.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Scene.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Screen.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Shader.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\BasicOperations.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Config.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="AABBTree\AABBTree.cpp">
+      <Filter>Source Files\AABBTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\SurfaceMeshObject.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Render\Texture.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\BasicTypes.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="JanBenderDynamics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContactDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Geometry.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionBasedDynamics\MathFunctions.cpp">
+      <Filter>Source Files\PBD</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionBasedDynamics\PositionBasedDynamics.cpp">
+      <Filter>Source Files\PBD</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionBasedDynamics\TimeIntegration.cpp">
+      <Filter>Source Files\PBD</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaraffDynamics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaraffMPCGSolver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaraffPhysics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simulator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Camera.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\EventManager.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Mesh.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Model.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\OpenGLContext.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\ResourceManager.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Scene.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Screen.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Shader.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\BasicOperations.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\BasicTypes.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Clock.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Geometry.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Test.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="AABBTree\AABBTree.h">
+      <Filter>Header Files\AABBTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\SurfaceMeshObject.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Render\Texture.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Types.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="JanBenderDynamics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContactDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionBasedDynamics\MathFunctions.h">
+      <Filter>Header Files\PBD</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionBasedDynamics\PositionBasedDynamics.h">
+      <Filter>Header Files\PBD</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionBasedDynamics\PositionBasedGenericConstraints.h">
+      <Filter>Header Files\PBD</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionBasedDynamics\TimeIntegration.h">
+      <Filter>Header Files\PBD</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GLSL\background_cube.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\background_cube.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\bounding_box.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\bounding_box.gs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\bounding_box.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_piece.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_piece.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_piece_debug.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_piece_debug.gs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_piece_debug.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\contact_point.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\contact_point.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\model_loading.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\model_loading.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\rigid_body.frag">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\rigid_body.vs">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+  </ItemGroup>
+</Project>
