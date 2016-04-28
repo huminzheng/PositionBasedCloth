@@ -242,19 +242,29 @@ public:
 //	virtual bool solvePositionConstraint(SimulationModel &model);
 //};
 
-//class IsometricBendingConstraint : public Constraint
-//{
-//public:
-//	static int TYPE_ID;
-//	Eigen::Matrix4f m_Q;
-//
-//	IsometricBendingConstraint() : Constraint(4) {}
-//	virtual int &getTypeId() const { return TYPE_ID; }
-//
-//	virtual bool initConstraint(SurfaceMesh3f &model, const unsigned int particle1, const unsigned int particle2,
-//		const unsigned int particle3, const unsigned int particle4);
-//	virtual bool solvePositionConstraint(SimulationModel &model);
-//};
+class IsometricBendingConstraint : public Constraint
+{
+public:
+	static int TYPE_ID;
+	
+	Eigen::Matrix4f m_Q;
+	
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_posMap;
+	SurfaceMesh3f::Property_map<Veridx, float> & m_invMassMap;
+	Veridx m_v1, m_v2, m_v3, m_v4;
+
+	IsometricBendingConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & posMap,
+		SurfaceMesh3f::Property_map<Veridx, float> & invMassMap,
+		Veridx v1, Veridx v2, Veridx v3, Veridx v4) : 
+		Constraint(4), m_posMap(posMap), m_invMassMap(invMassMap),
+		m_v1(v1), m_v2(v2), m_v3(v3), m_v4(v4)
+	{}
+
+	virtual int &getTypeId() const { return TYPE_ID; }
+
+	virtual bool initConstraint();
+	virtual bool solvePositionConstraint();
+};
 
 //class FEMTriangleConstraint : public Constraint
 //{

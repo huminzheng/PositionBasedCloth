@@ -147,8 +147,8 @@ private:
 class FOVControl
 {
 public:
-	FOVControl() :
-		camera(new Camera(glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3(0.0f, 1.0f, -0.4f)))
+	FOVControl(glm::vec3 position = glm::vec3(0.0f, 1.0f, 3.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, -0.4f), float yaw = YAW, float pitch = PITCH) :
+		camera(new Camera(position, up, yaw, pitch))
 	{}
 
 	// Moves/alters the camera positions based on user input

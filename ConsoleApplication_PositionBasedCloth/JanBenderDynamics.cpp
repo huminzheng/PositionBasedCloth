@@ -11,7 +11,7 @@
 //int RigidBodyParticleBallJoint::TYPE_ID = 5;
 int DistanceConstraint::TYPE_ID = 6;
 //int DihedralConstraint::TYPE_ID = 7;
-//int IsometricBendingConstraint::TYPE_ID = 8;
+int IsometricBendingConstraint::TYPE_ID = 8;
 //int FEMTriangleConstraint::TYPE_ID = 9;
 //int StrainTriangleConstraint::TYPE_ID = 10;
 //int VolumeConstraint::TYPE_ID = 11;
@@ -24,6 +24,7 @@ int DistanceConstraint::TYPE_ID = 6;
 //int TargetPositionMotorSliderJoint::TYPE_ID = 18;
 //int TargetVelocityMotorSliderJoint::TYPE_ID = 19;
 //int EdgeEdgeDistanceConstraint::TYPE_ID = 20;
+//int VertexFaceDistanceConstraint::TYPE_ID = 21;
 
 ////////////////////////////////////////////////////////////////////////////
 //// BallJoint
@@ -993,66 +994,59 @@ bool DistanceConstraint::solvePositionConstraint()
 //}
 
 
-////////////////////////////////////////////////////////////////////////////
-//// IsometricBendingConstraint
-////////////////////////////////////////////////////////////////////////////
-//bool IsometricBendingConstraint::initConstraint(SimulationModel &model, const unsigned int particle1, const unsigned int particle2,
-//	const unsigned int particle3, const unsigned int particle4)
-//{
-//	m_bodies[0] = particle1;
-//	m_bodies[1] = particle2;
-//	m_bodies[2] = particle3;
-//	m_bodies[3] = particle4;
-//
-//	ParticleData &pd = model.getParticles();
-//
-//	const Eigen::Vector3f &x1 = pd.getPosition0(particle1);
-//	const Eigen::Vector3f &x2 = pd.getPosition0(particle2);
-//	const Eigen::Vector3f &x3 = pd.getPosition0(particle3);
-//	const Eigen::Vector3f &x4 = pd.getPosition0(particle4);
-//
-//	return PositionBasedDynamics::init_IsometricBendingConstraint(x1, x2, x3, x4, m_Q);
-//}
-//
-//bool IsometricBendingConstraint::solvePositionConstraint(SimulationModel &model)
-//{
-//	ParticleData &pd = model.getParticles();
-//
-//	const unsigned i1 = m_bodies[0];
-//	const unsigned i2 = m_bodies[1];
-//	const unsigned i3 = m_bodies[2];
-//	const unsigned i4 = m_bodies[3];
-//
-//	Eigen::Vector3f &x1 = pd.getPosition(i1);
-//	Eigen::Vector3f &x2 = pd.getPosition(i2);
-//	Eigen::Vector3f &x3 = pd.getPosition(i3);
-//	Eigen::Vector3f &x4 = pd.getPosition(i4);
-//
-//	const float invMass1 = pd.getInvMass(i1);
-//	const float invMass2 = pd.getInvMass(i2);
-//	const float invMass3 = pd.getInvMass(i3);
-//	const float invMass4 = pd.getInvMass(i4);
-//
-//	Eigen::Vector3f corr1, corr2, corr3, corr4;
-//	const bool res = PositionBasedDynamics::solve_IsometricBendingConstraint(
-//		x1, invMass1, x2, invMass2, x3, invMass3, x4, invMass4,
-//		m_Q,
-//		model.getClothBendingStiffness(),
-//		corr1, corr2, corr3, corr4);
-//
-//	if (res)
-//	{
-//		if (invMass1 != 0.0f)
-//			x1 += corr1;
-//		if (invMass2 != 0.0f)
-//			x2 += corr2;
-//		if (invMass3 != 0.0f)
-//			x3 += corr3;
-//		if (invMass4 != 0.0f)
-//			x4 += corr4;
-//	}
-//	return res;
-//}
+//////////////////////////////////////////////////////////////////////////
+// IsometricBendingConstraint
+//////////////////////////////////////////////////////////////////////////
+bool IsometricBendingConstraint::initConstraint()
+{
+	Eigen::Vector3f & x1 = m_posMap[m_v1];
+	Eigen::Vector3f & x2 = m_posMap[m_v2];
+	Eigen::Vector3f & x3 = m_posMap[m_v3];
+	Eigen::Vector3f & x4 = m_posMap[m_v4];
+
+	return PBD::PositionBasedDynamics::init_IsometricBendingConstraint(x1, x2, x3, x4, m_Q);
+}
+
+bool IsometricBendingConstraint::solvePositionConstraint()
+{
+	Eigen::Vector3f & x1 = m_posMap[m_v1];
+	Eigen::Vector3f & x2 = m_posMap[m_v2];
+	Eigen::Vector3f & x3 = m_posMap[m_v3];
+	Eigen::Vector3f & x4 = m_posMap[m_v4];
+
+	if ((x1 - x2).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
+		(x2 - x3).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
+		(x3 - x1).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
+		(x3 - x4).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
+		(x4 - x2).norm() <= DISTANCE_OVERLAP_THRESHOLD)
+	{
+		return true;
+	}
+
+	float const invMass1 = m_invMassMap[m_v1];
+	float const invMass2 = m_invMassMap[m_v2];
+	float const invMass3 = m_invMassMap[m_v3];
+	float const invMass4 = m_invMassMap[m_v4];
+
+	Eigen::Vector3f corr1, corr2, corr3, corr4;
+	const bool res = PBD::PositionBasedDynamics::solve_IsometricBendingConstraint(
+		x1, invMass1, x2, invMass2, x3, invMass3, x4, invMass4,
+		m_Q, m_stiff,
+		corr1, corr2, corr3, corr4);
+
+	if (res)
+	{
+		if (invMass1 != 0.0f)
+			x1 += corr1;
+		if (invMass2 != 0.0f)
+			x2 += corr2;
+		if (invMass3 != 0.0f)
+			x3 += corr3;
+		if (invMass4 != 0.0f)
+			x4 += corr4;
+	}
+	return res;
+}
 
 ////////////////////////////////////////////////////////////////////////////
 //// FEMTriangleConstraint
@@ -1474,7 +1468,7 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 40.0f;
+		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 50.0f;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -1511,6 +1505,7 @@ void JanBenderDynamics::initial(float density)
 void JanBenderDynamics::addPermanentConstraints()
 {	
 	auto mesh = m_clothPiece->getMesh();
+	// add stretching and shearing constraints
 	for (auto eid : mesh->edges())
 	{
 		Constraint * cons = new DistanceConstraint(
@@ -1518,7 +1513,19 @@ void JanBenderDynamics::addPermanentConstraints()
 			mesh->vertex(eid, 0), mesh->vertex(eid, 1));
 		m_constraints.push_back(cons);
 	}
+	// add isometric bending constraints
+	for (auto eid : mesh->edges())
+	{
+		Veridx v1 = mesh->vertex(mesh->next_around_target(mesh->halfedge(eid, 0)), 1);
+		Veridx v2 = mesh->vertex(eid, 0);
+		Veridx v3 = mesh->vertex(eid, 1);
+		Veridx v4 = mesh->vertex(mesh->next_around_target(mesh->halfedge(eid, 1)), 1);
 
+		Constraint * cons = new IsometricBendingConstraint(
+			m_predictPositions, m_vertexInversedMasses,
+			v1, v2, v3, v4);
+		m_constraints.push_back(cons);
+	}
 }
 
 void JanBenderDynamics::userSet()
