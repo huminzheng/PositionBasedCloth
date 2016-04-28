@@ -1,6 +1,7 @@
 #include "JanBenderDynamics.h"
 #include "Util\BasicOperations.h"
 #include "Util\Geometry.h"
+#include "ContactDetection.h"
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
 
@@ -1431,6 +1432,47 @@ bool IsometricBendingConstraint::solvePositionConstraint()
 //	return res;
 //}
 
+//////////////////////////////////////////////////////////////////////////
+// VertexFaceDistanceConstraint
+//////////////////////////////////////////////////////////////////////////
+bool VertexFaceCollisionConstraint::initConstraint()
+{
+	return true;
+}
+
+bool VertexFaceCollisionConstraint::solvePositionConstraint()
+{
+	Eigen::Vector3f & p = m_vertexPosMap[m_v];
+	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
+	Eigen::Vector3f & p1 = m_facePosMap[m_fv2];
+	Eigen::Vector3f & p2 = m_facePosMap[m_fv3];
+
+	float const invMass1 = m_vertexMove ? m_vertexInvMassMap[m_v] : 0.0f;
+	float const invMass2 = m_faceMove ? m_faceInvMassMap[m_fv1] : 0.0f;
+	float const invMass3 = m_faceMove ? m_faceInvMassMap[m_fv2] : 0.0f;
+	float const invMass4 = m_faceMove ? m_faceInvMassMap[m_fv3] : 0.0f;
+
+	Eigen::Vector3f corr1, corr2, corr3, corr4;
+	bool res = PBD::PositionBasedDynamics::solve_TrianglePointDistanceConstraint(
+		p, invMass1, p0, invMass2, p1, invMass3, p2, invMass4,
+		m_distance, m_stiff, 0.0f, corr1, corr2, corr3, corr4);
+
+	if (res)
+	{
+		if (invMass1 != 0.0f)
+			p += corr1;
+		if (invMass2 != 0.0f)
+			p0 += corr2;
+		if (invMass3 != 0.0f)
+			p1 += corr3;
+		if (invMass4 != 0.0f)
+			p2 += corr4;
+	}
+
+	return true;
+}
+
+
 void JanBenderDynamics::initial(float density)
 {
 	SurfaceMesh3f * mesh = this->m_clothPiece->getMesh();
@@ -1511,7 +1553,7 @@ void JanBenderDynamics::addPermanentConstraints()
 		Constraint * cons = new DistanceConstraint(
 			m_planarCoordinates, m_predictPositions, m_vertexInversedMasses,
 			mesh->vertex(eid, 0), mesh->vertex(eid, 1));
-		m_constraints.push_back(cons);
+		m_permanentConstraints.push_back(cons);
 	}
 	// add isometric bending constraints
 	for (auto eid : mesh->edges())
@@ -1524,7 +1566,7 @@ void JanBenderDynamics::addPermanentConstraints()
 		Constraint * cons = new IsometricBendingConstraint(
 			m_predictPositions, m_vertexInversedMasses,
 			v1, v2, v3, v4);
-		m_constraints.push_back(cons);
+		m_permanentConstraints.push_back(cons);
 	}
 }
 
@@ -1543,6 +1585,8 @@ void JanBenderDynamics::userSet()
 void JanBenderDynamics::stepforward(float timeStep)
 {
 	std::cout << " ------------ new step ------------ " << std::endl;
+	m_temporaryConstraints.clear();
+
 	freeForward(timeStep);
 	genCollConstraints();
 	for (int _i = 0; _i < m_iterCount; ++_i)
@@ -1568,12 +1612,32 @@ void JanBenderDynamics::freeForward(float timeStep)
 
 void JanBenderDynamics::genCollConstraints()
 {
+	// TODO 
+	//auto contactHandler = new OtaduyContact(m_clothPiece, m_rigidBody);
+	//contactHandler->pointTriangleDetection(0.1f);
+	//contactHandler->edgeEdgeDetection(0.1f);
+	//
+	//float thickness = 0.1f;
 
+	//auto contacts = contactHandler->
+	//for (auto contact : contacts)
+	//{
+	//	Constraint * cons = new VertexFaceCollisionConstraint(
+	//		m_predictPositions, m_vertexInversedMasses,
+	//		m_predictPositions, m_vertexInversedMasses,
+	//		v, fv1, fv2, fv3, thickness);
+	//	m_temporaryConstraints.push_back();
+	//}
 }
 
 void JanBenderDynamics::projectConstraints(int iterCount)
 {
-	for (auto cons : m_constraints)
+	for (auto cons : m_permanentConstraints)
+	{
+		cons->updateConstraint();
+		cons->solvePositionConstraint();
+	}
+	for (auto cons : m_temporaryConstraints)
 	{
 		cons->updateConstraint();
 		cons->solvePositionConstraint();
@@ -1593,6 +1657,7 @@ void JanBenderDynamics::updateStates(float timeStep)
 
 void JanBenderDynamics::velocityUpdate()
 {
+
 }
 
 void JanBenderDynamics::writeBack()
@@ -1604,3 +1669,4 @@ void JanBenderDynamics::writeBack()
 	}
 	m_clothPiece->refreshNormals();
 }
+

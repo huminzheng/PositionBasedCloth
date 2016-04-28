@@ -372,26 +372,36 @@ public:
 //	virtual bool solvePositionConstraint(SimulationModel &model);
 //};
 
-//class VertexTriangleDistanceConstraint : public Constraint
-//{
-//public:
-//	static int TYPE_ID;
-//
-//	enum { POINTSIDE, TRIANGLESIDE, TWOSIDE };
-//
-//	unsigned int vobj;
-//	Veridx vidx;
-//	
-//	unsigned int fobj;
-//	Faceidx fidx;
-//
-//	VertexTriangleDistanceConstraint() : Constraint(4) {}
-//	virtual int &getTypeId() const { return TYPE_ID; }
-//
-//	virtual bool initConstraint(SimulationModel &model, const unsigned int particle1, const unsigned int particle2,
-//		const unsigned int particle3, const unsigned int particle4);
-//	virtual bool solvePositionConstraint(SimulationModel &model);
-//};
+class VertexFaceCollisionConstraint : public Constraint
+{
+public:
+	static int TYPE_ID;
+
+	float m_distance;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_vertexPosMap;
+	SurfaceMesh3f::Property_map<Veridx, float> & m_vertexInvMassMap;
+	Veridx m_v;
+	bool m_vertexMove;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_facePosMap;
+	SurfaceMesh3f::Property_map<Veridx, float> & m_faceInvMassMap;
+	Veridx m_fv1, m_fv2, m_fv3;
+	bool m_faceMove;
+
+	VertexFaceCollisionConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & vertexPosMap,
+		SurfaceMesh3f::Property_map<Veridx, float> & vertexInvMassMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & facePosMap,
+		SurfaceMesh3f::Property_map<Veridx, float> & faceInvMassMap,
+		Veridx v, Veridx fv1, Veridx fv2, Veridx fv3, float distance) :
+		Constraint(4), m_vertexPosMap(vertexPosMap), m_vertexInvMassMap(vertexInvMassMap),
+		m_facePosMap(facePosMap), m_faceInvMassMap(faceInvMassMap),
+		m_v(v), m_fv1(fv1), m_fv2(fv2), m_fv3(fv3), m_distance(distance)
+	{}
+
+	virtual int &getTypeId() const { return TYPE_ID; }
+
+	virtual bool initConstraint();
+	virtual bool solvePositionConstraint();
+};
 
 class JanBenderDynamics
 {
@@ -412,7 +422,9 @@ public:
 private:
 	SurfaceMeshObject * const m_clothPiece;
 
-	std::list<Constraint *> m_constraints;
+	std::list<Constraint *> m_permanentConstraints;
+	std::list<Constraint *> m_temporaryConstraints;
+
 	unsigned int m_iterCount = 8;
 
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_lastPositions;
