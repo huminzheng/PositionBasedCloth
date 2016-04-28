@@ -1537,18 +1537,13 @@ void JanBenderDynamics::stepforward(float timeStep)
 {
 	std::cout << " ------------ new step ------------ " << std::endl;
 	freeForward(timeStep);
-	std::cout << "generate collision constraints" << std::endl;
 	genCollConstraints();
-	std::cout << "project constraints" << std::endl;
 	for (int _i = 0; _i < m_iterCount; ++_i)
 	{
 		projectConstraints(m_iterCount);
 	}
-	std::cout << "update states" << std::endl;
 	updateStates(timeStep);
-	std::cout << "update velocities" << std::endl;
 	velocityUpdate();
-	std::cout << "write back" << std::endl;
 	writeBack();
 }
 
@@ -1583,7 +1578,7 @@ void JanBenderDynamics::updateStates(float timeStep)
 	float invTimeStep = 1.0f / timeStep;
 	for (auto vid : m_clothPiece->getMesh()->vertices())
 	{
-		m_vertexVelocities[vid] = 0.9f * invTimeStep * (m_currentPositions[vid] - m_lastPositions[vid]);
+		m_vertexVelocities[vid] = 0.95f * invTimeStep * (m_currentPositions[vid] - m_lastPositions[vid]);
 		m_lastPositions[vid] = m_currentPositions[vid];
 		m_currentPositions[vid] = m_predictPositions[vid];
 	}
