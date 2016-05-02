@@ -231,7 +231,7 @@ public:
 
 	SceneContact(Shader * boxShader, Shader * pointShader, Camera * camera) :
 		SceneComponent(), camera(camera),
-		boxShader(boxShader), pointShader(pointShader), contacts(nullptr)
+		boxShader(boxShader), pointShader(pointShader)
 	{}
 
 	virtual void draw() const;
@@ -242,14 +242,15 @@ public:
 
 	virtual ~SceneContact() {}
 
-	void setContacts(OtaduyContact * contacts)
+	void setContacts(GLfloat * points, GLuint pointCount)
 	{
-		this->contacts = contacts;
+		this->pointVerticesBuffer = points;
+		this->pointVerticesCount = pointCount;
 	}
 
 private:
 
-	OtaduyContact * contacts;
+	void * contacts = nullptr;
 
 	Shader * boxShader;
 	Shader * pointShader;
@@ -273,15 +274,9 @@ private:
 	GLuint edgeVAO, edgeVBO;
 
 	GLfloat * pointVerticesBuffer;
-	GLuint pointVerticesCount;
+	GLuint pointVerticesCount = 0;
 	GLfloat * edgeVerticesBuffer;
-	GLuint edgeVerticesCount;
-
-	//[6] = {
-	//	0.2f, 0.2f, 0.2f, 
-	//	0.6f, 0.6f, 0.6f };
-	//GLfloat * boxVerticesBuffer;
-	//GLuint pointSize;
+	GLuint edgeVerticesCount = 0;
 
 };
 

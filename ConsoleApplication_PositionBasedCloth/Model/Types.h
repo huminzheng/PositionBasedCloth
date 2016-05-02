@@ -1,20 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define CGAL_BASED
-
-#ifdef OPENMESH_BASED
-
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
-
-typedef OpenMesh::TriMesh_ArrayKernelT<> TriArrayMesh;
-typedef OpenMesh::PolyMesh_ArrayKernelT<> PolyArrayMesh;
-
-#endif
-
-#ifdef CGAL_BASED
-
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Surface_mesh.h>
 #include <CGAL/Polygon_mesh_processing/compute_normal.h>
@@ -48,6 +34,32 @@ typedef SurfaceMesh3f::Vertex_iterator Veriter;
 typedef SurfaceMesh3f::Edge_iterator Edgeiter;
 typedef SurfaceMesh3f::Face_iterator Faceiter;
 
-#endif
+/* ----------- Eigen based primitives ---------- */
+
+typedef Eigen::Vector3f PointEigen3f;
+
+struct TriangleEigen3f
+{
+	PointEigen3f vertex[3];
+};
+
+struct PlaneEigen3f
+{
+	PointEigen3f normal;
+	float distance;
+
+	PlaneEigen3f(TriangleEigen3f const & triangle)
+	{
+		normal = (triangle.vertex[0] - triangle.vertex[2])
+			.cross(triangle.vertex[1] - triangle.vertex[2]).normalized();
+		distance = -normal.transpose() * triangle.vertex[2];
+	}
+
+	PointEigen3f projection(PointEigen3f const & point)
+	{
+		return (point - (point.transpose() * normal + distance) * normal);
+	}
+};
+
 
 #endif

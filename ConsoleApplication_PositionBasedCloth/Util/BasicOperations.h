@@ -8,43 +8,9 @@
 #include <Eigen\Sparse>
 #include <unsupported/Eigen/CXX11/Tensor>
 
-#ifdef OPENMESH_BASED
-
-#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
-
-#endif
-
-#ifdef CGAL_BASED
-
 #include <CGAL\Simple_cartesian.h>
 
 #include "..\Model\SurfaceMeshObject.h"
-
-#endif
-
-#ifdef OPENMESH_BASED
-
-inline void copy_v3f(Eigen::Vector3f & dest, const OpenMesh::Vec3f & src)
-{
-	dest(0) = src[0];
-	dest(1) = src[1];
-	dest(2) = src[2];
-}
-
-inline void copy_v3f(OpenMesh::Vec3f & dest, const Eigen::Vector3f & src)
-{
-	dest[0] = src(0);
-	dest[1] = src(1);
-	dest[2] = src(2);
-}
-
-void shiftVertices(PolyArrayMesh::VertexHandle& vhd0, PolyArrayMesh::VertexHandle& vhd1, PolyArrayMesh::VertexHandle& vhd2);
-
-
-#endif
-
-#ifdef CGAL_BASED
 
 inline Eigen::Vector3f & displacement(Point3f const & dest, Point3f const & src)
 {
@@ -89,8 +55,6 @@ inline void copy_v3f(Point3f & dest, const Eigen::Vector3f & src)
 }
 
 void shiftVertices(Veridx & vhd0, Veridx & vhd1, Veridx & vhd2);
-
-#endif
 
 void convert_diag2sparse_mnf(Eigen::SparseMatrix<float> & dest, const Eigen::Diagonal<const Eigen::SparseMatrix<float>> & src);
 

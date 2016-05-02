@@ -1,7 +1,6 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
-#include "BaraffDynamics.h"
 #include "JanBenderDynamics.h"
 #include "Render\Scene.h"
 #include "Render\EventManager.h"
@@ -13,7 +12,7 @@ class Simulator
 public:
 
 	explicit Simulator():
-		viewer(new FOVControl(glm::vec3(0.0f, 0.0f, -20.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f)),
+		viewer(new FOVControl(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f)),
 		clock(new Clock())
 	{} 
 
@@ -26,7 +25,6 @@ private:
 
 	SurfaceMeshObject * clothPiece;
 	SurfaceMeshObject * rigidBody;
-	BaraffDynamics * clothDynamics;
 	OtaduyContact * contactHandler;
 	
 	JanBenderDynamics * jbDynamics;

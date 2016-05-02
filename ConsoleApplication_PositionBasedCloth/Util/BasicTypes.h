@@ -7,4 +7,5 @@ extern float const DISTANCE_OVERLAP_THRESHOLD;
 extern float const DISTANCE_OVERLAP_SQUARED_THRESHOLD;
 extern float const MATH_PI;
 
+
 #endif
