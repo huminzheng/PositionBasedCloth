@@ -16,6 +16,9 @@ public:
 		: entry(v)
 	{
 		num = hashing();
+		//std::cout << entry << std::endl;
+		//std::cout << hashSize << std::endl;
+		//std::cout << num << std::endl << std::endl;
 	}
 
 	Entry(int x, int y, int z)
@@ -32,14 +35,14 @@ public:
 
 private:
 	Eigen::Vector3i entry;
-	long num;
-	long hashSize = 1993;
+	unsigned long num;
+	unsigned long const hashSize = 1993l;
 	
-	long hashing()
+	unsigned long hashing()
 	{
-		return (long(entry.x()) * 73856093 % hashSize) ^
-			(long(entry.y()) * 19349663 % hashSize) ^
-				(long(entry.z()) * 83492791 % hashSize);
+		return (unsigned long(entry.x()) * 73856093l % hashSize) ^
+			(unsigned long(entry.y()) * 19349663l % hashSize) ^
+				(unsigned long(entry.z()) * 83492791l % hashSize);
 	}
 
 };

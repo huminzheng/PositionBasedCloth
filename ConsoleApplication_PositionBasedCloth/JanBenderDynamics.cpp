@@ -163,8 +163,8 @@ void JanBenderDynamics::genCollConstraints()
 	auto clothMesh = m_clothPiece->getMesh();
 	float thickness = 0.3f;
 
-	auto cor = PointEigen3f(100.0f, 100.0f, 100.0f);
-	SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 50.0f);
+	auto cor = PointEigen3f(500.0f, 500.0f, 500.0f);
+	SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
 	for (auto fid : clothMesh->faces())
 	{
 		spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions));
