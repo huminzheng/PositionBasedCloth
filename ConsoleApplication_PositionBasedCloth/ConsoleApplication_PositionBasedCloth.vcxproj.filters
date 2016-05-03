@@ -203,6 +203,9 @@
     <ClInclude Include="Constraints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AABBTree\SpatialHashing.h">
+      <Filter>Header Files\AABBTree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GLSL\background_cube.frag">

@@ -2,6 +2,7 @@
 #include "Util\BasicOperations.h"
 #include "Util\Geometry.h"
 #include "ContactDetection.h"
+#include "AABBTree\SpatialHashing.h"
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
 
@@ -48,7 +49,7 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 50.0f;
+		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 22.0f;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -119,7 +120,7 @@ void JanBenderDynamics::userSet()
 	int i = 0;
 	for (auto vid : m_clothPiece->getMesh()->vertices())
 	{
-		if (i == 0/* || i == 92*/)
+		if (i == 0 || i == 92)
 			//if (i == 1239 || i == 1362 || i == 1035)
 			m_vertexInversedMasses[vid] = 0.0f;
 		i += 1;
@@ -136,7 +137,7 @@ void JanBenderDynamics::stepforward(float timeStep)
 #ifdef USE_COLLISION_CONSTRAINTS
 	genCollConstraints();
 #endif
-	for (int _i = 0; _i < m_iterCount; ++_i)
+	for (unsigned int _i = 0; _i < m_iterCount; ++_i)
 	{
 		projectConstraints(m_iterCount);
 	}
@@ -160,23 +161,20 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	
-	AABBTree<Face3fRef, PointEigen3f> faceTree(
-		clothMesh->faces_begin(), clothMesh->faces_end(), 
-		FaceIter2Triangle3fAABBoxPair(*clothMesh, m_predictPositions),
-		clothMesh->number_of_faces());
+	float thickness = 0.3f;
 
-	//AABBTree<Face3fRef, PointEigen3f> faceTree(
-	//	clothMesh->faces_begin(), clothMesh->faces_end(),
-	//	TestToPair(),
-	//	clothMesh->number_of_faces());
-	
-	//auto faceTree = AABBTree<Face3fRef, PointEigen3f>();
-
-	float thickness = 0.1f;
-
+	auto cor = PointEigen3f(100.0f, 100.0f, 100.0f);
+	SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 50.0f);
+	for (auto fid : clothMesh->faces())
+	{
+		spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions));
+	}
 	for (auto vid : clothMesh->vertices())
 	{
+		Vertex3fRef verref(*clothMesh, vid, m_predictPositions);
+		auto candidates = spatial.candidate(verref);
+		
+		AABBTree<Face3fRef, PointEigen3f> faceTree(candidates);
 		auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
 			m_predictPositions[vid], 0.1f);
 
@@ -192,12 +190,6 @@ void JanBenderDynamics::genCollConstraints()
 			}
 			if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
 				continue;
-			//std::cout << "collision " << vid << " "
-			//	<< fvid[0] << " " << fvid[1] << " " << fvid[2] << std::endl
-			//	<< m_predictPositions[vid] << std::endl
-			//	<< m_predictPositions[fvid[0]] << std::endl
-			//	<< m_predictPositions[fvid[1]] << std::endl
-			//	<< m_predictPositions[fvid[2]] << std::endl;
 			Constraint * cons = new VertexFaceCollisionConstraint(
 				m_predictPositions, m_vertexInversedMasses,
 				m_predictPositions, m_vertexInversedMasses,
@@ -206,6 +198,39 @@ void JanBenderDynamics::genCollConstraints()
 			m_temporaryConstraints.push_back(cons);
 		}
 	}
+
+	//AABBTree<Face3fRef, PointEigen3f> faceTree(
+	//	clothMesh->faces_begin(), clothMesh->faces_end(), 
+	//	FaceIter2Triangle3fAABBoxPair(*clothMesh, m_predictPositions),
+	//	clothMesh->number_of_faces());
+
+	//float thickness = 0.3f;
+
+	//for (auto vid : clothMesh->vertices())
+	//{
+	//	auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
+	//		m_predictPositions[vid], 0.1f);
+
+	//	for (auto contact : *contacts)
+	//	{
+	//		Face3fRef const & faceref = faceTree.at(contact.first).second;
+	//		Veridx fvid[3];
+	//		int _i = 0;
+	//		for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
+	//		{
+	//			fvid[_i] = fv;
+	//			_i++;
+	//		}
+	//		if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
+	//			continue;
+	//		Constraint * cons = new VertexFaceCollisionConstraint(
+	//			m_predictPositions, m_vertexInversedMasses,
+	//			m_predictPositions, m_vertexInversedMasses,
+	//			vid, fvid[0], fvid[1], fvid[2],
+	//			true, true, thickness);
+	//		m_temporaryConstraints.push_back(cons);
+	//	}
+	//}
 }
 
 void JanBenderDynamics::projectConstraints(int iterCount)
@@ -215,10 +240,13 @@ void JanBenderDynamics::projectConstraints(int iterCount)
 		cons->updateConstraint();
 		cons->solvePositionConstraint();
 	}
-	for (auto cons : m_temporaryConstraints)
+	for (int _i = 0; _i < 5; ++_i)
 	{
-		cons->updateConstraint();
-		cons->solvePositionConstraint();
+		for (auto cons : m_temporaryConstraints)
+		{
+			cons->updateConstraint();
+			cons->solvePositionConstraint();
+		}
 	}
 }
 

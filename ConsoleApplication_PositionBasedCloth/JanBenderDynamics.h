@@ -31,6 +31,8 @@ public:
 private:
 	SurfaceMeshObject * const m_clothPiece;
 
+	//std::vector<SurfaceMeshObject *> m_rigidBodies;
+
 	std::list<Constraint *> m_permanentConstraints;
 	std::list<Constraint *> m_temporaryConstraints;
 

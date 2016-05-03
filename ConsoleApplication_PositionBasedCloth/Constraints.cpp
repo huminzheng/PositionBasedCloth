@@ -1467,6 +1467,11 @@ bool VertexFaceCollisionConstraint::solvePositionConstraint()
 			p1 += corr3;
 		if (invMass4 != 0.0f)
 			p2 += corr4;
+		//std::cout << m_stiff << std::endl;
+		//std::cout << corr1 << std::endl;
+		//std::cout << corr2 << std::endl;
+		//std::cout << corr3 << std::endl;
+		//std::cout << corr4 << std::endl;
 	}
 
 	return true;

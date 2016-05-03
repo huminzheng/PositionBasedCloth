@@ -66,7 +66,7 @@ AABBox<Point3f> AABBoxOf<Point3f, Segment3f>(Segment3f const & segment)
 class Face3fRef;
 
 template <>
-AABBox<Eigen::Vector3f> AABBoxOf<Eigen::Vector3f, Face3fRef>(Face3fRef const & faceref)
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref)
 {
 	auto const & mesh = faceref.mesh;
 	auto const & fid = faceref.faceidx;
@@ -78,10 +78,17 @@ AABBox<Eigen::Vector3f> AABBoxOf<Eigen::Vector3f, Face3fRef>(Face3fRef const & f
 		vids[_i] = vid;
 		_i++;
 	}
-	AABBox<Eigen::Vector3f> box(faceref.posMap[vids[0]], faceref.posMap[vids[1]]);
+	AABBox<PointEigen3f> box(faceref.posMap[vids[0]], faceref.posMap[vids[1]]);
 	box += faceref.posMap[vids[2]];
 	return box;
 }
+
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & verref)
+{
+	return AABBox<PointEigen3f>(verref.posMap[verref.veridx]);
+}
+
 
 struct Edge3fRef;
 

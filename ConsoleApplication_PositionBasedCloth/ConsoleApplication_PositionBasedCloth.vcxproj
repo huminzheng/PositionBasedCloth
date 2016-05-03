@@ -46,6 +46,7 @@
   <ItemGroup>
     <ClInclude Include="AABBTree\AABBox.h" />
     <ClInclude Include="AABBTree\AABBTree.h" />
+    <ClInclude Include="AABBTree\SpatialHashing.h" />
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="ContactDetection.h" />
     <ClInclude Include="JanBenderDynamics.h" />

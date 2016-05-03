@@ -36,6 +36,15 @@ public:
 		}
 	}
 
+	AABBTree(std::list<std::pair<PrimitiveRef, AABBox<PointType> > > & other)
+	{
+		tree.reserve(other.size());
+		for (auto & p : other)
+		{
+			tree.push_back(NodeType(p.second, p.first));
+		}
+	}
+
 	std::vector<NodeType const &> const & getBoxes() const
 	{
 		return tree;

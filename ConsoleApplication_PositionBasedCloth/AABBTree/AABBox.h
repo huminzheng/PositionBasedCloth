@@ -19,7 +19,7 @@ public:
 	AABBox(AABBox<PointType> const & other) :
 		m_minCor(other.m_minCor), m_maxCor(other.m_maxCor) 
 	{
-		std::cout << "WARNING::call AABB copy constructor" << std::endl;
+		//std::cout << "WARNING::call AABB copy constructor" << std::endl;
 	}
 
 	AABBox<PointType> & operator=(AABBox<PointType> const & other)
@@ -139,21 +139,53 @@ class Face3fRef
 public:
 	SurfaceMesh3f const & mesh;
 	Faceidx const faceidx;
-	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap;
+	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
 
 	Face3fRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
-		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap) :
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
 		mesh(mesh), faceidx(faceidx), posMap(posMap) {}
 
 	Face3fRef(Face3fRef && other) = default;
 	Face3fRef & operator=(Face3fRef && other) = default;
-	Face3fRef(Face3fRef const & other) = delete;
+	Face3fRef(Face3fRef const & other) = default;
 	Face3fRef & operator=(Face3fRef const & other) = delete;
+
+	PointEigen3f point(Veridx const & vid)
+	{
+		return posMap[vid];
+	}
+
+};
+
+class Vertex3fRef
+{
+public:
+	SurfaceMesh3f const & mesh;
+	Veridx const veridx;
+	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
+
+	Vertex3fRef(SurfaceMesh3f const & mesh, Veridx const veridx,
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
+		mesh(mesh), veridx(veridx), posMap(posMap) {}
+
+	Vertex3fRef(Vertex3fRef && other) = default;
+	Vertex3fRef & operator=(Vertex3fRef && other) = default;
+	Vertex3fRef(Vertex3fRef const & other) = delete;
+	Vertex3fRef & operator=(Vertex3fRef const & other) = delete;
+
+	// TODO change to range of PointEigen3fs
+	PointEigen3f point(Veridx const & vid)
+	{
+		return posMap[vid];
+	}
 
 };
 
 template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref);
+
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & verref);
 
 struct Edge3fRef
 {
