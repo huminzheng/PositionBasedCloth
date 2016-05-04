@@ -19,10 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AABBTree\AABBox.cpp" />
     <ClCompile Include="AABBTree\AABBTree.cpp" />
-    <ClCompile Include="BaraffDynamics.cpp" />
-    <ClCompile Include="BaraffMPCGSolver.cpp" />
-    <ClCompile Include="BaraffPhysics.cpp" />
+    <ClCompile Include="Constraints.cpp" />
     <ClCompile Include="ContactDetection.cpp" />
     <ClCompile Include="JanBenderDynamics.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -45,10 +44,10 @@
     <ClCompile Include="Util\Geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AABBTree\AABBox.h" />
     <ClInclude Include="AABBTree\AABBTree.h" />
-    <ClInclude Include="BaraffDynamics.h" />
-    <ClInclude Include="BaraffMPCGSolver.h" />
-    <ClInclude Include="BaraffPhysics.h" />
+    <ClInclude Include="AABBTree\SpatialHashing.h" />
+    <ClInclude Include="Constraints.h" />
     <ClInclude Include="ContactDetection.h" />
     <ClInclude Include="JanBenderDynamics.h" />
     <ClInclude Include="Model\SurfaceMeshObject.h" />
