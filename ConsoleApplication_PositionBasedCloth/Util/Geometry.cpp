@@ -1,5 +1,5 @@
 #include "Geometry.h"
-
+#include "BasicOperations.h"
 
 /* ---------------- intersection -------------------- */
 
@@ -62,6 +62,47 @@ bool intersection<Point3f, Triangle3f, Eigen::Vector3f>(
 		}
 		return false;
 	}
+}
+
+template <>
+bool intersection<PointEigen3f, TriangleEigen3f, Eigen::Vector3f>(
+	PointEigen3f const & point, TriangleEigen3f const & triangle, float tolerance,
+	Eigen::Vector3f & baryceterCoord)
+{
+	Eigen::Vector3f const & v1 = triangle.vertex[0];
+	Eigen::Vector3f const & v2 = triangle.vertex[1];
+	Eigen::Vector3f const & v3 = triangle.vertex[2];
+
+	PlaneEigen3f plane(triangle);
+
+	float sqdis = squared_distance(point, plane);
+	if (sqdis > tolerance)
+		return false;
+
+	PointEigen3f foot = plane.projection(point);
+
+	Eigen::Vector3f x13 = v1 - v3;
+	Eigen::Vector3f x23 = v2 - v3;
+	Eigen::Vector3f xf3 = foot - v3;
+	float x13tx13 = x13.squaredNorm();
+	float x13tx23 = x13.transpose() * x23;
+	float x23tx23 = x23.squaredNorm();
+
+	Eigen::Matrix3f A;
+	A << x13tx13, x13tx23, 0.0f,
+		x13tx23, x23tx23, 0.0f,
+		1.0f, 1.0f, 1.0f;
+	Eigen::Vector3f b;
+	b << x13.transpose() * xf3, x23.transpose() * xf3, 1.0f;
+	Eigen::Vector3f localCoord = A.householderQr().solve(b);
+	if (localCoord[0] > -tolerance && localCoord[0] < 1.0f + tolerance &&
+		localCoord[1] > -tolerance && localCoord[1] < 1.0f + tolerance &&
+		localCoord[2] > -tolerance && localCoord[2] < 1.0f + tolerance)
+	{
+		baryceterCoord << localCoord[0], localCoord[1], localCoord[2];
+		return true;
+	}
+	return false;
 }
 
 template <>

@@ -2,6 +2,7 @@
 #define DISTANCE_H
 
 #include "BasicTypes.h"
+#include "..\Model\Types.h"
 #include "Geometry.h"
 #include "..\AABBTree\AABBTree.h"
 
@@ -24,6 +25,7 @@ typedef CGAL::MP_Float ET;
 typedef CGAL::Polytope_distance_d_traits_3<Kernelf, ET, double> Traits;
 typedef CGAL::Polytope_distance_d<Traits>                 Polytope_distance;
 #endif
+
 
 /* ---------------- squared distance -------------------- */
 
@@ -67,6 +69,12 @@ inline float squared_distance<Point3f, Plane3f>(Point3f const & point, Plane3f c
 }
 
 template <>
+inline float squared_distance<PointEigen3f, PlaneEigen3f>(PointEigen3f const & point, PlaneEigen3f const & plane)
+{
+	return std::abs(point.transpose() * plane.normal + plane.distance);
+}
+
+template <>
 inline float squared_distance<Point3f, Point3f>(Point3f const & point, Point3f const & refPoint)
 {
 	return CGAL::squared_distance(point, refPoint);
@@ -82,6 +90,11 @@ bool intersection(Primitive const & p, RefPrimitive const & rp, float tolerance,
 template <>
 bool intersection<Point3f, Triangle3f, Eigen::Vector3f>(
 	Point3f const & point, Triangle3f const & triangle, float tolerance,
+	Eigen::Vector3f & baryceterCoord);
+
+template <>
+bool intersection<PointEigen3f, TriangleEigen3f, Eigen::Vector3f>(
+	PointEigen3f const & point, TriangleEigen3f const & triangle, float tolerance,
 	Eigen::Vector3f & baryceterCoord);
 
 template <>

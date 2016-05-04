@@ -227,10 +227,21 @@ void SceneClothPiece::update()
 
 	viewPos = camera->Position;
 
-	
-	meshVB = nullptr;
-	meshVNormalB = nullptr;
-	meshEB = nullptr;
+	if (meshVB != nullptr)
+	{
+		delete[] meshVB;
+		meshVB = nullptr;
+	}
+	if (meshVNormalB != nullptr)
+	{
+		delete[] meshVNormalB;
+		meshVNormalB = nullptr;
+	}
+	if (meshEB != nullptr)
+	{
+		delete[] meshEB;
+		meshEB = nullptr;
+	}
 	meshVBcnt = 0, meshEBcnt = 0;
 	//conditionBuffer = nullptr;
 	//conditionCnt = 0;
@@ -238,8 +249,16 @@ void SceneClothPiece::update()
 
 	if (drawNormal)
 	{
-		fBarycentreBuffer = nullptr;
-		fNormalBuffer = nullptr;
+		if (fBarycentreBuffer != nullptr)
+		{
+			delete[] fBarycentreBuffer;
+			fBarycentreBuffer = nullptr;
+		}
+		if (fNormalBuffer != nullptr)
+		{
+			delete[] fNormalBuffer;
+			fNormalBuffer = nullptr;
+		}
 		fSize = 0;
 		clothPiece->exportFaceNorm3fBuffer(fBarycentreBuffer, fNormalBuffer, fSize);
 	}
@@ -334,9 +353,21 @@ void SceneRigidBody::update()
 
 	viewPos = camera->Position;
 
-	meshVB = nullptr;
-	meshVNormalB = nullptr;
-	meshEB = nullptr;
+	if (meshVB != nullptr)
+	{
+		delete[] meshVB;
+		meshVB = nullptr;
+	}
+	if (meshVNormalB != nullptr)
+	{
+		delete[] meshVNormalB;
+		meshVNormalB = nullptr;
+	}
+	if (meshEB != nullptr)
+	{
+		delete[] meshEB;
+		meshEB = nullptr;
+	}
 	meshVBcnt = 0, meshEBcnt = 0;
 	
 	rigidBody->exportPos3fNorm3fBuffer(meshVB, meshVNormalB, meshVBcnt, meshEB, meshEBcnt);
@@ -362,18 +393,12 @@ void SceneRigidBody::load()
 void SceneContact::draw()
 const
 {
-	if (contacts == nullptr)
-		return;
+	//if (contacts == nullptr)
+	//	return;
 
 	glDepthMask(GL_TRUE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	
-	boxShader->Use();
-
-	glUniformMatrix4fv(glGetUniformLocation(boxShader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-	glUniformMatrix4fv(glGetUniformLocation(boxShader->Program, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(boxShader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-
 	if (drawTrees)
 	{
 		glBindVertexArray(treeVAO0);
@@ -429,7 +454,6 @@ const
 		}
 		glBindVertexArray(0);
 
-		delete[] pointVerticesBuffer;
 	}
 
 	if (edgeVerticesCount > 0)
@@ -454,7 +478,6 @@ const
 		}
 		glBindVertexArray(0);
 
-		delete[] edgeVerticesBuffer;
 	}
 
 }
@@ -488,19 +511,19 @@ void SceneContact::load()
 
 void SceneContact::update()
 {
-	if (contacts == nullptr)
-		return;
+	//if (contacts == nullptr)
+	//	return;
 
 	projection = glm::perspective(camera->Zoom, Screen::aspectRatio, 0.1f, 100.0f);
 	view = camera->GetViewMatrix();
 	model = glm::scale(glm::mat4(), glm::vec3(0.20f, 0.20f, 0.20f));
 	model = glm::translate(model, glm::vec3(0.0f, 0.40f, 0.0f)); // Translate it down a bit so it's at the center of the scene
 
-	if (drawTrees)
-	{
-		contacts->m_clothPieceFaceBoxTree->getTree()->exportAABBoxPositions(boxTreeVerticesBuffer0, treeVerticesCount0);
-		contacts->m_rigidBodyFaceBoxTree->getTree()->exportAABBoxPositions(boxTreeVerticesBuffer1, treeVerticesCount1);
-	}
-	contacts->exportContactPoints(pointVerticesBuffer, pointVerticesCount);
-	contacts->exportContactEdges(edgeVerticesBuffer, edgeVerticesCount);
+	//if (drawTrees)
+	//{
+	//	contacts->m_clothPieceFaceBoxTree->getTree()->exportAABBoxPositions(boxTreeVerticesBuffer0, treeVerticesCount0);
+	//	contacts->m_rigidBodyFaceBoxTree->getTree()->exportAABBoxPositions(boxTreeVerticesBuffer1, treeVerticesCount1);
+	//}
+	//contacts->exportContactPoints(pointVerticesBuffer, pointVerticesCount);
+	//contacts->exportContactEdges(edgeVerticesBuffer, edgeVerticesCount);
 }

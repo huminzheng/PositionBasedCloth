@@ -7,7 +7,6 @@
 #include "Render\ResourceManager.h"
 
 #include "Model\SurfaceMeshObject.h"
-#include "BaraffDynamics.h"
 #include "Simulator.h"
 
 // Other Libs

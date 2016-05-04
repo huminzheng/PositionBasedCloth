@@ -103,13 +103,17 @@ void Simulator::updateData()
 {
 	
 	jbDynamics->userSet();
-	jbDynamics->stepforward(0.1f);
+	jbDynamics->stepforward(0.03f);
+
+	GLfloat * buffer = nullptr;
+	GLuint size = 0;
+	jbDynamics->exportCollisionVertices(buffer, size);
 
 	//contactHandler = new OtaduyContact(clothPiece, rigidBody);
 	//contactHandler->pointTriangleDetection(0.1f);
 	//contactHandler->edgeEdgeDetection(0.1f);
-	//(dynamic_cast<SceneContact *>(Scene::get_component(contactSceneIndex)))
-	//	->setContacts(contactHandler);
+	(dynamic_cast<SceneContact *>(Scene::get_component(contactSceneIndex)))
+		->setContacts(buffer, size);
 
 }
 
