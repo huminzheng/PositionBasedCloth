@@ -82,84 +82,21 @@ public:
 	template <typename Obj, typename Foot>
 	std::list<std::pair<Index, Foot> > *
 	contactDetection(Obj const & obj, float tolerance);
-	//{
-	//	//std::cout << "WARNING: default contact detection calling" << std::endl;
-	//	return new std::list<Index>();
-	//}
 	
 private:
 	std::vector<NodeType> tree;
 
 };
 
-class Face3fRef;
-
 typedef AABBTree<Face3fRef, PointEigen3f> Face3fTree;
 
-/* --------------- conversions implementations --------------- */
+typedef AABBTree<Face3fContinuesRef, PointEigen3f> Face3fConTree;
 
-class FaceIter2Triangle3fAABBoxPair
+struct ContinuousCollideResult
 {
-	typedef SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> VPropertyMap;
-	
-	VPropertyMap const & m_propertyMap;
-	SurfaceMesh3f const & m_mesh;
-
-public:
-	FaceIter2Triangle3fAABBoxPair(SurfaceMesh3f const & mesh, VPropertyMap const & propertyMap) :
-		m_mesh(mesh), m_propertyMap(propertyMap) {}
-
-	Face3fTree::NodeType operator() (Faceiter const & iter) const
-	{ 
-		Faceidx fid = *iter;
-		Face3fRef ref(m_mesh, fid, m_propertyMap);
-		auto box = AABBoxOf<PointEigen3f, Face3fRef>(ref);
-		auto node = Face3fTree::NodeType(std::move(box), std::move(ref));
-		return std::move(node);
-	}
-
+	enum {CLOSE, INTERSECTION} state;
+	float time;
+	Eigen::Vector3f coord;
 };
-
-//class TestToPair
-//{
-//public:
-//	Face3fTree::NodeType operator() (Faceiter const & iter) const
-//	{
-//		AABBox<PointEigen3f> box(Eigen::Vector3f::Zero());
-//		return Face3fTree::NodeType(box, Face3fRef());
-//	}
-//};
-
-//struct EdgeIter2Segment3fAABBoxPair
-//{
-//
-//	typedef SurfaceMesh3f::Property_map<Veridx, Point3f> VPropertyMap;
-//
-//	SurfaceMesh3f const * const m_mesh;
-//	VPropertyMap const * const m_propertyMap;
-//
-//	EdgeIter2Segment3fAABBoxPair(SurfaceMesh3f * mesh, VPropertyMap * propertyMap = nullptr) : 
-//		m_mesh(mesh), m_propertyMap(propertyMap) {}
-//
-//	AABBTree<Segment3f, Point3f>::NodeType * operator() (/*SurfaceMesh3f const * mesh, */Edgeiter const & iter) const
-//	{
-//		Edgeidx eid = *iter;
-//		Veridx vid0 = m_mesh->vertex(eid, 0);
-//		Veridx vid1 = m_mesh->vertex(eid, 1);
-//		Point3f v0 = (this->m_propertyMap) ? (*m_propertyMap)[vid0] : m_mesh->point(vid0);
-//		Point3f v1 = (this->m_propertyMap) ? (*m_propertyMap)[vid1] : m_mesh->point(vid1);
-//		float maxx = (std::max)(v0.x(), v1.x());
-//		float maxy = (std::max)(v0.y(), v1.y());
-//		float maxz = (std::max)(v0.z(), v1.z());
-//		float minx = (std::min)(v0.x(), v1.x());
-//		float miny = (std::min)(v0.y(), v1.y());
-//		float minz = (std::min)(v0.z(), v1.z());
-//		auto box = new AABBox<Point3f>(Point3f(minx, miny, minz), Point3f(maxx, maxy, maxz));
-//		auto seg = new Segment3f(v0, v1);
-//		//std::cout << "box" << std::endl << box->minCor() << std::endl << box->maxCor() << std::endl;
-//		//std::cout << "triangle" << std::endl << ps[0] << std::endl << ps[1] << std::endl << ps[2] << std::endl;
-//		return new AABBTree<Segment3f, Point3f>::NodeType(box, seg);
-//	}
-//};
 
 #endif

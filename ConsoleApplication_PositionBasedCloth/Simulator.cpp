@@ -103,7 +103,7 @@ void Simulator::updateData()
 {
 	
 	jbDynamics->userSet();
-	jbDynamics->stepforward(0.03f);
+	jbDynamics->stepforward(0.1f);
 
 	GLfloat * buffer = nullptr;
 	GLuint size = 0;

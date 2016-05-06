@@ -206,6 +206,9 @@
     <ClInclude Include="AABBTree\SpatialHashing.h">
       <Filter>Header Files\AABBTree</Filter>
     </ClInclude>
+    <ClInclude Include="Model\PrimitiveReference.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GLSL\background_cube.frag">

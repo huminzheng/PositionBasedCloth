@@ -153,3 +153,39 @@ bool intersection<Segment3f, Segment3f, Eigen::Vector2f>(
 		return true;
 	}
 }
+
+/* -------------- coplanar --------------- */
+bool coplane(Eigen::Vector3f const & x1, Eigen::Vector3f const & v1, 
+	Eigen::Vector3f const & x2, Eigen::Vector3f const & v2,
+	Eigen::Vector3f const & x3, Eigen::Vector3f const & v3, 
+	Eigen::Vector3f const & x4, Eigen::Vector3f const & v4, 
+	float & time)
+{
+	Eigen::Vector3f x21 = x1 - x2;
+	Eigen::Vector3f x31 = x1 - x3;
+	Eigen::Vector3f x41 = x1 - x4;
+	Eigen::Vector3f v21 = v1 - v2;
+	Eigen::Vector3f v31 = v1 - v3;
+	Eigen::Vector3f v41 = v1 - v4;
+
+	float a0 = x21.cross(x31).transpose() * x41;
+	float a1 = float(v21.cross(x31).transpose() * x41) + (x21.cross(v31).transpose() * x41) + (x21.cross(x31).transpose() * v41);
+	float a2 = float(v21.cross(v31).transpose() * x41) + (v21.cross(x31).transpose() * v41) + (x21.cross(v31).transpose() * v41);
+	float a3 = v21.cross(v31).transpose() * v41;
+
+	//// check the signal of start and end time 
+	//if (a0 * (a3 + a2 + a1 + a0) > DISTANCE_OVERLAP_THRESHOLD)
+	//	return false;
+
+	for (int _i = 0; _i < 10; _i++)
+	{
+		float f_deriv = (3 * a3 * time + 2 * a2) * time + a1;
+		if (f_deriv < DISTANCE_OVERLAP_THRESHOLD && f_deriv > -DISTANCE_OVERLAP_THRESHOLD)
+			return false;
+		float f = ((a3 * time + a2) * time + a1) * time + a0;
+		time = time - f / f_deriv;
+		if (f < DISTANCE_OVERLAP_THRESHOLD && f > -DISTANCE_OVERLAP_THRESHOLD)
+			return true;
+	}
+	return false;
+}

@@ -50,6 +50,7 @@
     <ClInclude Include="Constraints.h" />
     <ClInclude Include="ContactDetection.h" />
     <ClInclude Include="JanBenderDynamics.h" />
+    <ClInclude Include="Model\PrimitiveReference.h" />
     <ClInclude Include="Model\SurfaceMeshObject.h" />
     <ClInclude Include="Model\Types.h" />
     <ClInclude Include="PositionBasedDynamics\MathFunctions.h" />

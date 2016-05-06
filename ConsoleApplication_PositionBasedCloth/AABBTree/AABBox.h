@@ -4,6 +4,8 @@
 #include "../Util/BasicTypes.h"
 #include "../Util/BasicOperations.h"
 #include "../Model/Types.h"
+#include "../Model/PrimitiveReference.h"
+
 
 template <typename PointType>
 class AABBox
@@ -46,7 +48,6 @@ public:
 		//std::cout << "WARNING::call AABB move assignment" << std::endl;
 		return *this;
 	}
-
 
 	AABBox<PointType> & operator+=(AABBox<PointType> const & rhs)
 	{
@@ -131,55 +132,11 @@ float AABBox<Point3f>::squared_distance<Point3f>(Point3f const & point) const;
 template <> template <>
 float AABBox<PointEigen3f>::squared_distance<PointEigen3f>(PointEigen3f const & point) const;
 
+template <> template <>
+float AABBox<PointEigen3f>::squared_distance<AABBox<PointEigen3f> >(AABBox<PointEigen3f> const & box) const;
+
 template <>
 AABBox<Point3f> AABBoxOf<Point3f, Segment3f>(Segment3f const & segment);
-
-class Face3fRef
-{
-public:
-	SurfaceMesh3f const & mesh;
-	Faceidx const faceidx;
-	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
-
-	Face3fRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
-		mesh(mesh), faceidx(faceidx), posMap(posMap) {}
-
-	Face3fRef(Face3fRef && other) = default;
-	Face3fRef & operator=(Face3fRef && other) = default;
-	Face3fRef(Face3fRef const & other) = default;
-	Face3fRef & operator=(Face3fRef const & other) = delete;
-
-	PointEigen3f point(Veridx const & vid)
-	{
-		return posMap[vid];
-	}
-
-};
-
-class Vertex3fRef
-{
-public:
-	SurfaceMesh3f const & mesh;
-	Veridx const veridx;
-	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
-
-	Vertex3fRef(SurfaceMesh3f const & mesh, Veridx const veridx,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
-		mesh(mesh), veridx(veridx), posMap(posMap) {}
-
-	Vertex3fRef(Vertex3fRef && other) = default;
-	Vertex3fRef & operator=(Vertex3fRef && other) = default;
-	Vertex3fRef(Vertex3fRef const & other) = delete;
-	Vertex3fRef & operator=(Vertex3fRef const & other) = delete;
-
-	// TODO change to range of PointEigen3fs
-	PointEigen3f point(Veridx const & vid)
-	{
-		return posMap[vid];
-	}
-
-};
 
 template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref);
@@ -187,19 +144,13 @@ AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref
 template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & verref);
 
-struct Edge3fRef
-{
-	SurfaceMesh3f const & mesh;
-	Edgeidx const & edgeidx;
-	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap;
-
-	Edge3fRef(SurfaceMesh3f const & mesh, Edgeidx const & edgeidx,
-		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap) :
-		mesh(mesh), edgeidx(edgeidx), posMap(posMap) {}
-
-};
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Edge3fRef>(Edge3fRef const & edgeref);
 
 template <>
-AABBox<Eigen::Vector3f> AABBoxOf<Eigen::Vector3f, Edge3fRef>(Edge3fRef const & edgeref);
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fContinuesRef>(Face3fContinuesRef const & faceconref);
+
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fContinuesRef>(Vertex3fContinuesRef const & verconref);
 
 #endif

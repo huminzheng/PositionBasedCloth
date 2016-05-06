@@ -102,4 +102,11 @@ bool intersection<Segment3f, Segment3f, Eigen::Vector2f>(
 	Segment3f const & seg1, Segment3f const & seg2, float tolerance,
 	Eigen::Vector2f & barycenterCoord);
 
+/* -------------- coplanar --------------- */
+bool coplane(Eigen::Vector3f const & x1, Eigen::Vector3f const & v1,
+	Eigen::Vector3f const & x2, Eigen::Vector3f const & v2,
+	Eigen::Vector3f const & x3, Eigen::Vector3f const & v3,
+	Eigen::Vector3f const & x4, Eigen::Vector3f const & v4, 
+	float & time);
+
 #endif

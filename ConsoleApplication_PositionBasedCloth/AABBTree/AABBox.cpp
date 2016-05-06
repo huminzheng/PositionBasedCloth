@@ -57,13 +57,27 @@ float AABBox<Eigen::Vector3f>::squared_distance<PointEigen3f>(PointEigen3f const
 	return delta_x * delta_x + delta_y * delta_y + delta_z * delta_z;
 }
 
+template <> template <>
+float AABBox<PointEigen3f>::squared_distance<AABBox<PointEigen3f> >(AABBox<PointEigen3f> const & box) const
+{
+	Eigen::Vector3f delta0 = this->m_maxCor - box.m_minCor;
+	Eigen::Vector3f delta1 = box.m_maxCor - this->m_minCor;
+	Eigen::Vector3f delta(
+		(std::min)((std::max)(delta0.x(), 0.0f), (std::max)(delta1.x(), 0.0f)),
+		(std::min)((std::max)(delta0.y(), 0.0f), (std::max)(delta1.y(), 0.0f)),
+		(std::min)((std::max)(delta0.z(), 0.0f), (std::max)(delta1.z(), 0.0f)));
+
+	//std::cout << "delta x " << delta_x << " delta y " << delta_y << " delta z " << delta_z << std::endl;
+
+	return delta.squaredNorm();
+}
+
+
 template <>
 AABBox<Point3f> AABBoxOf<Point3f, Segment3f>(Segment3f const & segment)
 {
 	return AABBox<Point3f>(segment.start(), segment.end());
 }
-
-class Face3fRef;
 
 template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref)
@@ -89,9 +103,6 @@ AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & ver
 	return AABBox<PointEigen3f>(verref.posMap[verref.veridx]);
 }
 
-
-struct Edge3fRef;
-
 template <>
 AABBox<Eigen::Vector3f> AABBoxOf<Eigen::Vector3f, Edge3fRef>(Edge3fRef const & edgeref)
 {
@@ -102,4 +113,33 @@ AABBox<Eigen::Vector3f> AABBoxOf<Eigen::Vector3f, Edge3fRef>(Edge3fRef const & e
 		edgeref.posMap[mesh.vertex(eid, 1)]);
 }
 
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fContinuesRef>(Face3fContinuesRef const & faceconref)
+{
+	auto const & mesh = faceconref.mesh;
+	auto const & fid = faceconref.faceidx;
+	Veridx vids[6];
+	int _i = 0;
+	for (auto vid : mesh.vertices_around_face(mesh.halfedge(fid)))
+	{
+		vids[_i] = vid;
+		_i++;
+	}
+	AABBox<PointEigen3f> box(faceconref.point0(vids[0]));
+	box += faceconref.point0(vids[1]);
+	box += faceconref.point0(vids[2]);
+	box += faceconref.point1(vids[0]);
+	box += faceconref.point1(vids[1]);
+	box += faceconref.point1(vids[2]);
+	return std::move(box);
+
+}
+
+template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fContinuesRef>(Vertex3fContinuesRef const & verconref)
+{
+	auto const & mesh = verconref.mesh;
+	auto const & vid = verconref.veridx;
+	return AABBox<PointEigen3f>(verconref.point0(vid), verconref.point1(vid));
+}
 

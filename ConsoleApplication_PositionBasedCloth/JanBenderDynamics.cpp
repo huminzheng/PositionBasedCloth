@@ -49,7 +49,7 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 22.0f;
+		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 45.0f;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -164,23 +164,24 @@ void JanBenderDynamics::genCollConstraints()
 	float thickness = 0.3f;
 
 	auto cor = PointEigen3f(500.0f, 500.0f, 500.0f);
-	SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
+	SpatialHashing<Face3fContinuesRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
 	for (auto fid : clothMesh->faces())
 	{
-		spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions));
+		spatial.insert(Face3fContinuesRef(*clothMesh, fid, m_currentPositions, m_predictPositions));
 	}
 	for (auto vid : clothMesh->vertices())
 	{
-		Vertex3fRef verref(*clothMesh, vid, m_predictPositions);
+		Vertex3fContinuesRef verref(*clothMesh, vid, m_currentPositions, m_predictPositions);
 		auto candidates = spatial.candidate(verref);
 		
-		AABBTree<Face3fRef, PointEigen3f> faceTree(candidates);
-		auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
-			m_predictPositions[vid], 0.1f);
+		AABBTree<Face3fContinuesRef, PointEigen3f> faceTree(candidates);
+		auto contacts = faceTree.contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>(
+			verref, 0.1f);
 
 		for (auto contact : *contacts)
 		{
-			Face3fRef const & faceref = faceTree.at(contact.first).second;
+			Face3fContinuesRef const & faceref = faceTree.at(contact.first).second;
+			auto const & conInfo = contact.second;
 			Veridx fvid[3];
 			int _i = 0;
 			for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
@@ -190,11 +191,12 @@ void JanBenderDynamics::genCollConstraints()
 			}
 			if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
 				continue;
-			Constraint * cons = new VertexFaceCollisionConstraint(
+			Constraint * cons = new VertexFaceDirectedDistanceConstraint(
 				m_predictPositions, m_vertexInversedMasses,
 				m_predictPositions, m_vertexInversedMasses,
 				vid, fvid[0], fvid[1], fvid[2],
-				true, true, thickness);
+				true, true, conInfo.state == ContinuousCollideResult::CLOSE ? true : false, 
+				thickness, conInfo.time);
 			m_temporaryConstraints.push_back(cons);
 		}
 	}
