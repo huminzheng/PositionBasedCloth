@@ -450,6 +450,12 @@ const
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+			glBindBuffer(GL_ARRAY_BUFFER, pointTypesVBO);
+			glBufferData(GL_ARRAY_BUFFER, pointVerticesCount * 1 * sizeof(GLuint), pointTypesBuffer, GL_STATIC_DRAW);
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(1, 1, GL_UNSIGNED_INT, GL_FALSE, 1 * sizeof(GLuint), (GLvoid *)0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 			glDrawArrays(GL_POINTS, 0, pointVerticesCount);
 		}
 		glBindVertexArray(0);
@@ -499,13 +505,15 @@ void SceneContact::load()
 		std::cout << "aabbox vbo " << treeVBO1 << std::endl;
 	}
 	glGenVertexArrays(1, &pointVAO);
-	std::cout << "aabbox vao " << pointVAO << std::endl;
+	std::cout << "collision point vao " << pointVAO << std::endl;
 	glGenBuffers(1, &pointVBO);
-	std::cout << "aabbox vbo " << pointVBO << std::endl;
+	std::cout << "collision point vbo " << pointVBO << std::endl;
+	glGenBuffers(1, &pointTypesVBO);
+	std::cout << "collision point type vbo " << pointTypesVBO << std::endl;
 	glGenVertexArrays(1, &edgeVAO);
-	std::cout << "aabbox vao " << edgeVAO << std::endl;
+	std::cout << "collision edge vao " << edgeVAO << std::endl;
 	glGenBuffers(1, &edgeVBO);
-	std::cout << "aabbox vbo " << edgeVBO << std::endl;
+	std::cout << "collision edge vbo " << edgeVBO << std::endl;
 
 }
 

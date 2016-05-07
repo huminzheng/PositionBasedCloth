@@ -26,7 +26,7 @@ public:
 
 	void stepforward(float timeStep);
 
-	void exportCollisionVertices(GLfloat *& buffer, GLuint & size);
+	void exportCollisionVertices(GLfloat *& buffer, GLuint *& type, GLuint & size);
 	
 private:
 	SurfaceMeshObject * const m_clothPiece;

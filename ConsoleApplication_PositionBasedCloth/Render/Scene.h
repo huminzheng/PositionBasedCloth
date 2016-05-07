@@ -242,9 +242,10 @@ public:
 
 	virtual ~SceneContact() {}
 
-	void setContacts(GLfloat * points, GLuint pointCount)
+	void setContacts(GLfloat * points, GLuint * types, GLuint pointCount)
 	{
 		this->pointVerticesBuffer = points;
+		this->pointTypesBuffer = types;
 		this->pointVerticesCount = pointCount;
 	}
 
@@ -270,11 +271,13 @@ private:
 	GLfloat * boxTreeVerticesBuffer1;
 	GLuint treeVerticesCount1;
 
-	GLuint pointVAO, pointVBO;
+	GLuint pointVAO, pointVBO, pointTypesVBO;
 	GLuint edgeVAO, edgeVBO;
 
 	GLfloat * pointVerticesBuffer;
+	GLuint * pointTypesBuffer;
 	GLuint pointVerticesCount = 0;
+
 	GLfloat * edgeVerticesBuffer;
 	GLuint edgeVerticesCount = 0;
 

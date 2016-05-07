@@ -69,6 +69,7 @@ bool intersection<PointEigen3f, TriangleEigen3f, Eigen::Vector3f>(
 	PointEigen3f const & point, TriangleEigen3f const & triangle, float tolerance,
 	Eigen::Vector3f & baryceterCoord)
 {
+	//std::cout << "PointEigen3f TriangleEigen3f intersection called" << std::endl;
 	Eigen::Vector3f const & v1 = triangle.vertex[0];
 	Eigen::Vector3f const & v2 = triangle.vertex[1];
 	Eigen::Vector3f const & v3 = triangle.vertex[2];
@@ -154,6 +155,7 @@ bool intersection<Segment3f, Segment3f, Eigen::Vector2f>(
 	}
 }
 
+//#define DEBUG_COPLANE
 /* -------------- coplanar --------------- */
 bool coplane(Eigen::Vector3f const & x1, Eigen::Vector3f const & v1, 
 	Eigen::Vector3f const & x2, Eigen::Vector3f const & v2,
@@ -168,10 +170,20 @@ bool coplane(Eigen::Vector3f const & x1, Eigen::Vector3f const & v1,
 	Eigen::Vector3f v31 = v1 - v3;
 	Eigen::Vector3f v41 = v1 - v4;
 
+#ifdef DEBUG_COPLANE
+	std::cout << x1 << std::endl << x2 << std::endl << x3 << std::endl << x4 << std::endl;
+	std::cout << "x21" << std::endl << x21 << std::endl;
+	std::cout << "x31" << std::endl << x31 << std::endl;
+	std::cout << "x41" << std::endl << x41 << std::endl;
+#endif
 	float a0 = x21.cross(x31).transpose() * x41;
 	float a1 = float(v21.cross(x31).transpose() * x41) + (x21.cross(v31).transpose() * x41) + (x21.cross(x31).transpose() * v41);
 	float a2 = float(v21.cross(v31).transpose() * x41) + (v21.cross(x31).transpose() * v41) + (x21.cross(v31).transpose() * v41);
 	float a3 = v21.cross(v31).transpose() * v41;
+	
+#ifdef DEBUG_COPLANE
+	std::cout << " a0 " << a0 << " a1 " << a1 << " a2 " << a2 << " a3 " << a3 << std::endl;
+#endif
 
 	//// check the signal of start and end time 
 	//if (a0 * (a3 + a2 + a1 + a0) > DISTANCE_OVERLAP_THRESHOLD)

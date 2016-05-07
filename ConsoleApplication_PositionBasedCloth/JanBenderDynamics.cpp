@@ -49,7 +49,7 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 45.0f;
+		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 55.0f;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -158,81 +158,97 @@ void JanBenderDynamics::freeForward(float timeStep)
 	}
 }
 
+#define USE_STATIC_COLLISION
+#define USE_CONTINUOUS_COLLISION
+
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float thickness = 0.3f;
+	float thickness = 0.1f;
+	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
-	auto cor = PointEigen3f(500.0f, 500.0f, 500.0f);
-	SpatialHashing<Face3fContinuesRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
-	for (auto fid : clothMesh->faces())
+	/* ---------- check static collision ---------- */
+#ifdef USE_STATIC_COLLISION
 	{
-		spatial.insert(Face3fContinuesRef(*clothMesh, fid, m_currentPositions, m_predictPositions));
-	}
-	for (auto vid : clothMesh->vertices())
-	{
-		Vertex3fContinuesRef verref(*clothMesh, vid, m_currentPositions, m_predictPositions);
-		auto candidates = spatial.candidate(verref);
-		
-		AABBTree<Face3fContinuesRef, PointEigen3f> faceTree(candidates);
-		auto contacts = faceTree.contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>(
-			verref, 0.1f);
-
-		for (auto contact : *contacts)
+		SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
+		for (auto fid : clothMesh->faces())
 		{
-			Face3fContinuesRef const & faceref = faceTree.at(contact.first).second;
-			auto const & conInfo = contact.second;
-			Veridx fvid[3];
-			int _i = 0;
-			for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
+			spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions));
+		}
+		for (auto vid : clothMesh->vertices())
+		{
+			Vertex3fRef verref(*clothMesh, vid, m_predictPositions);
+			auto candidates = spatial.candidate(verref);
+
+			AABBTree<Face3fRef, PointEigen3f> faceTree(candidates);
+			auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
+				m_predictPositions[vid], 0.1f);
+
+			for (auto contact : *contacts)
 			{
-				fvid[_i] = fv;
-				_i++;
+				Face3fRef const & faceref = faceTree.at(contact.first).second;
+				Veridx fvid[3];
+				int _i = 0;
+				for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
+				{
+					fvid[_i] = fv;
+					_i++;
+				}
+				if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
+					continue;
+				Constraint * cons = new VertexFaceCollisionConstraint(
+					m_predictPositions, m_vertexInversedMasses,
+					m_predictPositions, m_vertexInversedMasses,
+					vid, fvid[0], fvid[1], fvid[2],
+					true, true, thickness);
+				m_temporaryConstraints.push_back(cons);
 			}
-			if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
-				continue;
-			Constraint * cons = new VertexFaceDirectedDistanceConstraint(
-				m_predictPositions, m_vertexInversedMasses,
-				m_predictPositions, m_vertexInversedMasses,
-				vid, fvid[0], fvid[1], fvid[2],
-				true, true, conInfo.state == ContinuousCollideResult::CLOSE ? true : false, 
-				thickness, conInfo.time);
-			m_temporaryConstraints.push_back(cons);
 		}
 	}
+#endif
 
-	//AABBTree<Face3fRef, PointEigen3f> faceTree(
-	//	clothMesh->faces_begin(), clothMesh->faces_end(), 
-	//	FaceIter2Triangle3fAABBoxPair(*clothMesh, m_predictPositions),
-	//	clothMesh->number_of_faces());
+#ifdef USE_CONTINUOUS_COLLISION
+	/* ---------- check continuous collision ---------- */
+	{
+		SpatialHashing<Face3fContinuesRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
+		for (auto fid : clothMesh->faces())
+		{
+			spatial.insert(Face3fContinuesRef(*clothMesh, fid, m_currentPositions, m_predictPositions));
+		}
+		for (auto vid : clothMesh->vertices())
+		{
+			Vertex3fContinuesRef verref(*clothMesh, vid, m_currentPositions, m_predictPositions);
+			auto candidates = spatial.candidate(verref);
 
-	//float thickness = 0.3f;
+			AABBTree<Face3fContinuesRef, PointEigen3f> faceTree(candidates);
+			auto contacts = faceTree.contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>(
+				verref, 0.1f);
 
-	//for (auto vid : clothMesh->vertices())
-	//{
-	//	auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
-	//		m_predictPositions[vid], 0.1f);
+			for (auto contact : *contacts)
+			{
+				Face3fContinuesRef const & faceref = faceTree.at(contact.first).second;
+				auto const & conInfo = contact.second;
+				Veridx fvid[3];
+				int _i = 0;
+				for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
+				{
+					fvid[_i] = fv;
+					_i++;
+				}
+				if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
+					continue;
+				Constraint * cons = new VertexFaceDirectedDistanceConstraint(
+					m_predictPositions, m_vertexInversedMasses,
+					m_predictPositions, m_vertexInversedMasses,
+					vid, fvid[0], fvid[1], fvid[2],
+					true, true, conInfo.state == ContinuousCollideResult::CLOSE ? true : false,
+					thickness, conInfo.time);
+				m_temporaryConstraints.push_back(cons);
+			}
+		}
+	}
+#endif
 
-	//	for (auto contact : *contacts)
-	//	{
-	//		Face3fRef const & faceref = faceTree.at(contact.first).second;
-	//		Veridx fvid[3];
-	//		int _i = 0;
-	//		for (auto fv : clothMesh->vertices_around_face(clothMesh->halfedge(faceref.faceidx)))
-	//		{
-	//			fvid[_i] = fv;
-	//			_i++;
-	//		}
-	//		if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
-	//			continue;
-	//		Constraint * cons = new VertexFaceCollisionConstraint(
-	//			m_predictPositions, m_vertexInversedMasses,
-	//			m_predictPositions, m_vertexInversedMasses,
-	//			vid, fvid[0], fvid[1], fvid[2],
-	//			true, true, thickness);
-	//		m_temporaryConstraints.push_back(cons);
-	//	}
-	//}
 }
 
 void JanBenderDynamics::projectConstraints(int iterCount)
@@ -278,20 +294,33 @@ void JanBenderDynamics::writeBack()
 	m_clothPiece->refreshNormals();
 }
 
-void JanBenderDynamics::exportCollisionVertices(GLfloat *& buffer, GLuint & size)
+void JanBenderDynamics::exportCollisionVertices(GLfloat *& buffer, GLuint *& type, GLuint & size)
 {
-	size = m_temporaryConstraints.size();
-	buffer = new GLfloat[size * 3];
-	memset(buffer, 0, sizeof(GLfloat) * 3 * size);
-	int pivot = 0;
+	int capacity = m_temporaryConstraints.size();
+	buffer = new GLfloat[capacity* 3];
+	type = new GLuint[capacity* 1];
+	memset(buffer, 0, sizeof(GLfloat) * 3 * capacity);
+	memset(type, 0, sizeof(GLuint) * 1 * capacity);
+	size = 0;
 	for (auto cons : m_temporaryConstraints)
 	{
 		if (cons->getTypeId() == 21)
 		{
 			Veridx vid = ((VertexFaceCollisionConstraint *)cons)->m_v;
-			buffer[pivot++] = m_currentPositions[vid].x();
-			buffer[pivot++] = m_currentPositions[vid].y();
-			buffer[pivot++] = m_currentPositions[vid].z();
+			buffer[size * 3] = m_currentPositions[vid].x();
+			buffer[size * 3 + 1] = m_currentPositions[vid].y();
+			buffer[size * 3 + 2] = m_currentPositions[vid].z();
+			type[size] = 21u;
+			size += 1;
+		}
+		else if (cons->getTypeId() == 22)
+		{
+			Veridx vid = ((VertexFaceDirectedDistanceConstraint *)cons)->m_v;
+			buffer[size * 3] = m_currentPositions[vid].x();
+			buffer[size * 3 + 1] = m_currentPositions[vid].y();
+			buffer[size * 3 + 2] = m_currentPositions[vid].z();
+			type[size] = 22u;
+			size += 1;
 		}
 	}
 }

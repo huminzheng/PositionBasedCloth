@@ -97,6 +97,8 @@ Face3fConTree::contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>
 			vids[_i] = vid;
 			_i++;
 		}
+		if (vids[0] == point.veridx || vids[1] == point.veridx || vids[2] == point.veridx)
+			continue;
 		Eigen::Vector3f x1 = faceref.point0(vids[0]);
 		Eigen::Vector3f x2 = faceref.point0(vids[1]);
 		Eigen::Vector3f x3 = faceref.point0(vids[2]);
@@ -106,15 +108,18 @@ Face3fConTree::contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>
 		Eigen::Vector3f v3 = faceref.point1(vids[2]) - x3;
 		Eigen::Vector3f v4 = point.point1(point.veridx) - x4;
 		Eigen::Vector3f v_relative = (v1 + v2 + v3) / 2 - v4;
-
-		float coplaneTime = 0;
-		bool parallel = coplane(x1, v1, x2, v2, x3, v3, x4, v4, coplaneTime);
-		bool intersected = false;
-
-		if (coplaneTime < 0.0f || coplaneTime > 1.0f + tolerance / v_relative.norm())
+		float v_relative_norm = v_relative.norm();
+		if (v_relative_norm <= DISTANCE_OVERLAP_THRESHOLD)
 			continue;
-		if (!parallel && coplaneTime >= 0.0f && coplaneTime <= 1.0f)
-			intersected = true;
+
+		float coplaneTime = 0.5f;
+		bool coplaned = coplane(x1, v1, x2, v2, x3, v3, x4, v4, coplaneTime);
+		//bool intersected = false;
+
+		if (!coplaned || (coplaneTime < 0.0f || coplaneTime > 1.0f /*+ tolerance / v_relative_norm*/))
+			continue;
+		//if (coplaned && coplaneTime >= 0.0f && coplaneTime <= 1.0f)
+		//	intersected = true;
 
 		TriangleEigen3f triangle;
 		triangle.vertex[0] = x1 + coplaneTime * v1;
@@ -122,11 +127,11 @@ Face3fConTree::contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>
 		triangle.vertex[2] = x3 + coplaneTime * v3;
 		
 		Eigen::Vector3f coord;
-		if (!intersection(x4 + coplaneTime * v4, triangle, tolerance, coord))
+		if (!intersection<PointEigen3f, TriangleEigen3f, Eigen::Vector3f>(x4 + coplaneTime * v4, triangle, tolerance, coord))
 			continue;
 		
 		ContinuousCollideResult res;
-		res.state = intersected ? ContinuousCollideResult::INTERSECTION : ContinuousCollideResult::CLOSE;
+		res.state = /*intersected ? */ContinuousCollideResult::INTERSECTION/* : ContinuousCollideResult::CLOSE*/;
 		res.time = coplaneTime;
 		res.coord << coord;
 		result->push_back(Pair(idx, std::move(res)));

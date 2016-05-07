@@ -1523,6 +1523,11 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 	return true;
 }
 
+/* solve triangle point distance constraint,
+ * with forward/backward face of triangle makes difference,
+ * constraint function is 
+ * C(q, p1, p2, p3) = (q - p1) * n_directed_hat - h 
+ */
 bool DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(const Eigen::Vector3f & p, float invMass, const Eigen::Vector3f & p0, float invMass0, const Eigen::Vector3f & p1, float invMass1, const Eigen::Vector3f & p2, float invMass2, const float restDist, const float compressionStiffness, const float stretchStiffness, const bool forward, Eigen::Vector3f & corr, Eigen::Vector3f & corr0, Eigen::Vector3f & corr1, Eigen::Vector3f & corr2)
 {
 	// find barycentric coordinates of closest point on triangle
@@ -1581,9 +1586,9 @@ bool DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstrain
 	}
 	Eigen::Vector3f q = p0 * b0 + p1 * b1 + p2 * b2;
 	Eigen::Vector3f n = (p - q) * ((forward) ? 1.0f : -1.0f);
-	float dist = n.norm();
+	float dist = n.norm() * ((forward) ? 1.0f : -1.0f);
 	n.normalize();
-	float C = dist * ((forward) ? 1.0f : -1.0f) - restDist;
+	float C = dist - restDist;
 	Eigen::Vector3f grad = n;
 	Eigen::Vector3f grad0 = -n * b0;
 	Eigen::Vector3f grad1 = -n * b1;
