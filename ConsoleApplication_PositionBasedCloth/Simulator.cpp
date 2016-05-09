@@ -55,13 +55,7 @@ void Simulator::init()
 	
 	clothPiece = new SurfaceMeshObject(3);
 	clothPiece->import(ourModel.getMeshes()[0]);
-	//clothPiece->useVTexCoord2DAsVPlanarCoord3f();
-	//clothPiece->addPositionsProperty();
-	
-	// initial planar coordinates
-	//clothDynamics = new BaraffDynamics(clothPiece);
 
-	jbDynamics = new JanBenderDynamics(clothPiece);
 
 	auto env = new SceneEnv(ResourceManager::GetShader("background_cube"),
 		ResourceManager::GetCubeMap("background_texture"), viewer->getCamera());
@@ -78,8 +72,16 @@ void Simulator::init()
 		(aiPostProcessSteps)(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices));
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
-	//rigidBody->addPositionsProperty();
+	Eigen::Matrix4f mat;
+	mat << 1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f;
+	rigidBody->modelTransform(mat);
 
+	jbDynamics = new JanBenderDynamics(clothPiece);
+	jbDynamics->addRigidBody(rigidBody);
+	
 	auto sph = new SceneRigidBody(ResourceManager::GetShader("rigid_body"),
 		rigidBody, viewer->getCamera());
 	Scene::add_component(sph);

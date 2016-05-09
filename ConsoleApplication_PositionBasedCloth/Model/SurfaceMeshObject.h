@@ -28,12 +28,14 @@ public:
 		EDGES(edges), PolyMesh(new SurfaceMesh3f())
 	{}
 
-	SurfaceMesh3f* getMesh()
+	SurfaceMesh3f* getMesh() const
 	{
 		return PolyMesh;
 	}
 
 	void import(const Mesh mesh);
+
+	void modelTransform(Eigen::Matrix4f const & matrix);
 
 	bool getVPlanarCoord3f(SurfaceMesh3f::Property_map<Veridx, Point3f> & vph);
 

@@ -12,10 +12,12 @@ public:
 	SurfaceMesh3f const & mesh;
 	Faceidx const faceidx;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const & invMass;
 
 	Face3fRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
-		mesh(mesh), faceidx(faceidx), posMap(posMap) {}
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const & invMass) :
+		mesh(mesh), faceidx(faceidx), posMap(posMap), invMass(invMass) {}
 
 	Face3fRef(Face3fRef && other) = default;
 	Face3fRef & operator=(Face3fRef && other) = default;
@@ -35,10 +37,12 @@ public:
 	SurfaceMesh3f const & mesh;
 	Veridx const veridx;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const & invMass;
 
 	Vertex3fRef(SurfaceMesh3f const & mesh, Veridx const veridx,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap) :
-		mesh(mesh), veridx(veridx), posMap(posMap) {}
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const & invMass) :
+		mesh(mesh), veridx(veridx), posMap(posMap), invMass(invMass) {}
 
 	Vertex3fRef(Vertex3fRef && other) = default;
 	Vertex3fRef & operator=(Vertex3fRef && other) = default;
@@ -59,10 +63,12 @@ public:
 	SurfaceMesh3f const & mesh;
 	Edgeidx const & edgeidx;
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const & invMass;
 
 	Edge3fRef(SurfaceMesh3f const & mesh, Edgeidx const & edgeidx,
-		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap) :
-		mesh(mesh), edgeidx(edgeidx), posMap(posMap) {}
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & posMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const & invMass) :
+		mesh(mesh), edgeidx(edgeidx), posMap(posMap), invMass(invMass) {}
 
 	Edge3fRef(Edge3fRef && other) = default;
 	Edge3fRef & operator=(Edge3fRef && other) = default;
@@ -82,11 +88,13 @@ public:
 	Faceidx const faceidx;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap0;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1;
+	SurfaceMesh3f::Property_map<Veridx, float> const & invMass;
 
 	Face3fContinuesRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
 		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap0,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1) :
-		mesh(mesh), faceidx(faceidx), posMap0(posMap0), posMap1(posMap1) {}
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1,
+		SurfaceMesh3f::Property_map<Veridx, float> const & invMass) :
+		mesh(mesh), faceidx(faceidx), posMap0(posMap0), posMap1(posMap1), invMass(invMass) {}
 
 	Face3fContinuesRef(Face3fContinuesRef && other) = default;
 	Face3fContinuesRef & operator=(Face3fContinuesRef && other) = default;
@@ -112,11 +120,13 @@ public:
 	Veridx const veridx;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap0;
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1;
+	SurfaceMesh3f::Property_map<Veridx, float> const & invMass;
 
 	Vertex3fContinuesRef(SurfaceMesh3f const & mesh, Veridx const veridx,
 		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap0,
-		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1) :
-		mesh(mesh), veridx(veridx), posMap0(posMap0), posMap1(posMap1) {}
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const & posMap1,
+		SurfaceMesh3f::Property_map<Veridx, float> const & invMass) :
+		mesh(mesh), veridx(veridx), posMap0(posMap0), posMap1(posMap1), invMass(invMass) {}
 
 	Vertex3fContinuesRef(Vertex3fContinuesRef && other) = default;
 	Vertex3fContinuesRef & operator=(Vertex3fContinuesRef && other) = default;

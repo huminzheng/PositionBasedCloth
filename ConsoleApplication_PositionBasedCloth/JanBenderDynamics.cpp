@@ -10,6 +10,10 @@
 #define USE_SHEAR_CONSTRAINTS
 #define USE_BEND_CONSRTAINTS
 #define USE_COLLISION_CONSTRAINTS
+//#define USE_STATIC_COLLISION
+#define USE_CONTINUOUS_COLLISION
+//#define USE_SELF_COLLISION
+#define USE_RIGIDBODY_COLLISION
 
 
 void JanBenderDynamics::initial(float density)
@@ -49,7 +53,7 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 55.0f;
+		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 45.0f;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -81,11 +85,45 @@ void JanBenderDynamics::initial(float density)
 		m_vertexInversedMasses[vid] = 1.0f / density;
 	}
 
+
+
+}
+
+void JanBenderDynamics::addRigidBody(SurfaceMeshObject * const surfaceMeshObject)
+{
+	/* ----------- initial rigid bodies' properties ---------- */
+	auto const & rbmesh = surfaceMeshObject->getMesh();
+
+	auto & rbcurpos = rbmesh->property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
+	if (!rbcurpos.second) rbcurpos = rbmesh->add_property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
+	auto const & cpmap = rbcurpos.first;
+
+	auto & rbprepos = rbmesh->property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexPredictPositions);
+	if (!rbprepos.second) rbprepos = rbmesh->add_property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexPredictPositions);
+	auto const & ppmap = rbprepos.first;
+
+	auto rbvermass = rbmesh->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexMasses);
+	if (!rbvermass.second) rbvermass = rbmesh->add_property_map<Veridx, float>(SurfaceMeshObject::pname_vertexMasses);
+	auto const & mmap = rbvermass.first;
+
+	auto rbverinvmass = rbmesh->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses);
+	if (!rbverinvmass.second) rbverinvmass = rbmesh->add_property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses);
+	auto const & immap = rbverinvmass.first;
+
+	for (Veridx vid : rbmesh->vertices())
+	{
+		copy_v3f(cpmap[vid], rbmesh->point(vid));
+		ppmap[vid] = cpmap[vid];
+		mmap[vid] = POSITIVE_MAX_FLOAT;
+		immap[vid] = 0.0f;
+	}
+
+	m_rigidBodies.push_back(surfaceMeshObject);
 }
 
 void JanBenderDynamics::addPermanentConstraints()
 {	
-	auto mesh = m_clothPiece->getMesh();
+	auto const & mesh = m_clothPiece->getMesh();
 
 #if defined(USE_STRETCH_CONSTRAINTS) && defined(USE_SHEAR_CONSTRAINTS)
 	// add stretching and shearing constraints
@@ -148,7 +186,7 @@ void JanBenderDynamics::stepforward(float timeStep)
 
 void JanBenderDynamics::freeForward(float timeStep)
 {
-	auto mesh = m_clothPiece->getMesh();
+	auto const & mesh = m_clothPiece->getMesh();
 	for (auto vid : mesh->vertices())
 	{
 		auto v = m_vertexVelocities[vid];
@@ -158,8 +196,6 @@ void JanBenderDynamics::freeForward(float timeStep)
 	}
 }
 
-#define USE_STATIC_COLLISION
-#define USE_CONTINUOUS_COLLISION
 
 void JanBenderDynamics::genCollConstraints()
 {
@@ -171,18 +207,43 @@ void JanBenderDynamics::genCollConstraints()
 #ifdef USE_STATIC_COLLISION
 	{
 		SpatialHashing<Face3fRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
+#ifdef USE_SELF_COLLISION
 		for (auto fid : clothMesh->faces())
 		{
-			spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions));
+			spatial.insert(Face3fRef(*clothMesh, fid, m_predictPositions, m_vertexInversedMasses));
 		}
-		for (auto vid : clothMesh->vertices())
+#endif
+#ifdef USE_RIGIDBODY_COLLISION
+		for (auto * ptr : m_rigidBodies)
 		{
-			Vertex3fRef verref(*clothMesh, vid, m_predictPositions);
+			auto const & pmap = ptr->getMesh()->property_map<Veridx, PointEigen3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
+			auto const & immap = ptr->getMesh()->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses);
+			for (auto fid : ptr->getMesh()->faces())
+			{
+				spatial.insert(Face3fRef(*ptr->getMesh(), fid, pmap.first, immap.first));
+			}
+		}
+#endif
+		//for (int _i = 0; _i < 10; ++_i)
+		//{
+		//	std::cout << "test map" << std::endl;
+		//	Vertex3fRef verref(*clothMesh, (Veridx) 0, m_predictPositions, m_vertexInversedMasses);
+		//	std::cout << verref.point((Veridx)0) << std::endl;
+		//}
+
+		// BUG so strange bugs when with this simplified loop
+		//for (auto vid : clothMesh->vertices())
+		for (auto it = clothMesh->vertices_begin(); it != clothMesh->vertices_end(); ++it)
+		{
+			Veridx vid = *it;
+			Vertex3fRef verref(*clothMesh, vid, m_predictPositions, m_vertexInversedMasses);
 			auto candidates = spatial.candidate(verref);
+			//if (candidates.size() > 0)
+			//	std::cout << "candidates" << std::endl;
 
 			AABBTree<Face3fRef, PointEigen3f> faceTree(candidates);
-			auto contacts = faceTree.contactDetection<PointEigen3f, Eigen::Vector3f>(
-				m_predictPositions[vid], 0.1f);
+			auto contacts = faceTree.contactDetection<Vertex3fRef, Eigen::Vector3f>(
+				verref, 0.1f);
 
 			for (auto contact : *contacts)
 			{
@@ -204,6 +265,8 @@ void JanBenderDynamics::genCollConstraints()
 				m_temporaryConstraints.push_back(cons);
 			}
 		}
+
+
 	}
 #endif
 
@@ -211,13 +274,30 @@ void JanBenderDynamics::genCollConstraints()
 	/* ---------- check continuous collision ---------- */
 	{
 		SpatialHashing<Face3fContinuesRef, PointEigen3f> spatial(-1 * cor, cor, cor / 100.0f);
+#ifdef USE_SELF_COLLISION
 		for (auto fid : clothMesh->faces())
 		{
-			spatial.insert(Face3fContinuesRef(*clothMesh, fid, m_currentPositions, m_predictPositions));
+			spatial.insert(Face3fContinuesRef(*clothMesh, fid, m_currentPositions, m_predictPositions, m_vertexInversedMasses));
 		}
-		for (auto vid : clothMesh->vertices())
+#endif
+#ifdef USE_RIGIDBODY_COLLISION
+		for (auto * ptr : m_rigidBodies)
 		{
-			Vertex3fContinuesRef verref(*clothMesh, vid, m_currentPositions, m_predictPositions);
+			auto const & cpmap = ptr->getMesh()->property_map<Veridx, PointEigen3f>(SurfaceMeshObject::pname_vertexCurrentPositions).first;
+			auto const & ppmap = ptr->getMesh()->property_map<Veridx, PointEigen3f>(SurfaceMeshObject::pname_vertexPredictPositions).first;
+			auto const & immap = ptr->getMesh()->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses).first;
+			for (auto fid : ptr->getMesh()->faces())
+			{
+				spatial.insert(Face3fContinuesRef(*ptr->getMesh(), fid, cpmap, ppmap, immap));
+			}
+		}
+#endif
+		// BUG so strange bugs when with this simplified loop
+		//for (Veridx vid : clothMesh->vertices())
+		for (auto it = clothMesh->vertices_begin(); it != clothMesh->vertices_end(); ++it)
+		{
+			Veridx vid = *it;
+			Vertex3fContinuesRef verref(*clothMesh, vid, m_currentPositions, m_predictPositions, m_vertexInversedMasses);
 			auto candidates = spatial.candidate(verref);
 
 			AABBTree<Face3fContinuesRef, PointEigen3f> faceTree(candidates);
@@ -238,8 +318,8 @@ void JanBenderDynamics::genCollConstraints()
 				if (fvid[0] == vid || fvid[1] == vid || fvid[2] == vid)
 					continue;
 				Constraint * cons = new VertexFaceDirectedDistanceConstraint(
-					m_predictPositions, m_vertexInversedMasses,
-					m_predictPositions, m_vertexInversedMasses,
+					m_predictPositions, verref.invMass,
+					m_predictPositions, faceref.invMass,
 					vid, fvid[0], fvid[1], fvid[2],
 					true, true, conInfo.state == ContinuousCollideResult::CLOSE ? true : false,
 					thickness, conInfo.time);
@@ -263,7 +343,7 @@ void JanBenderDynamics::projectConstraints(int iterCount)
 		for (auto cons : m_temporaryConstraints)
 		{
 			cons->updateConstraint();
-			cons->solvePositionConstraint();
+ 			cons->solvePositionConstraint();
 		}
 	}
 }
@@ -286,7 +366,7 @@ void JanBenderDynamics::velocityUpdate()
 
 void JanBenderDynamics::writeBack()
 {
-	auto mesh = m_clothPiece->getMesh();
+	auto const & mesh = m_clothPiece->getMesh();
 	for (auto vid : mesh->vertices())
 	{
 		copy_v3f(mesh->point(vid), m_currentPositions[vid]);

@@ -84,6 +84,18 @@ void SurfaceMeshObject::import(const Mesh mesh)
 		<< ", #faces " << PolyMesh->number_of_faces() << std::endl;
 }
 
+void SurfaceMeshObject::modelTransform(Eigen::Matrix4f const & matrix)
+{
+	for (auto vid : PolyMesh->vertices())
+	{
+		auto & pos = PolyMesh->point(vid);
+		Eigen::Vector4f p, np;
+		p << pos.x(), pos.y(), pos.z(), 1.0f;
+		np = matrix * p;
+		PolyMesh->point(vid) = Point3f(np.x(), np.y(), np.z());
+	}
+}
+
 Eigen::VectorXf SurfaceMeshObject::getPositions() const
 {
 	Eigen::VectorXf positions = Eigen::VectorXf(VERTEX_SIZE * 3);

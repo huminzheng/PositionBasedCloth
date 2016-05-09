@@ -42,13 +42,11 @@ Face3fTree::contactDetection<Eigen::Vector3f, Eigen::Vector3f>
 		AABBox<PointEigen3f> const & box = iter->first;
 		Face3fRef const & faceref = iter->second;
 		float sqdis = 0.0f;
-#pragma region test_box
 		{
 			// should near the bounding box
 			if (box.squared_distance(point) >= tolerance)
 				continue;
 		}
-#pragma endregion test_box
 		//std::cout << "box " << std::endl
 		//	<< box->minCor() << std::endl << box->maxCor() << std::endl;
 		Eigen::Vector3f coord;
@@ -59,12 +57,53 @@ Face3fTree::contactDetection<Eigen::Vector3f, Eigen::Vector3f>
 			//std::cout << "face " << faceref.faceidx << std::endl;
 			for (auto vid : mesh.vertices_around_face(mesh.halfedge(faceref.faceidx)))
 			{
-				triangle.vertex[_i] = faceref.posMap[vid];
+				triangle.vertex[_i] = faceref.point(vid);
 				_i++;
 			}
 		}
 		{
 			if (!intersection(point, triangle, tolerance, coord))
+				continue;
+		}
+		result->push_back(Pair(idx, coord));
+	}
+	return result;
+}
+
+template<> template<>
+std::list<std::pair<typename Face3fTree::Index, Eigen::Vector3f> > *
+Face3fTree::contactDetection<Vertex3fRef, Eigen::Vector3f>
+(Vertex3fRef const & point, float tolerance)
+{
+	typedef std::pair<Face3fTree::Index, Eigen::Vector3f> Pair;
+	std::list<Pair> * result = new std::list<Pair>();
+	Face3fTree::Index idx = 0;
+	for (auto iter = tree.begin(); iter != tree.end(); ++iter, ++idx)
+	{
+		AABBox<PointEigen3f> const & box = iter->first;
+		Face3fRef const & faceref = iter->second;
+		float sqdis = 0.0f;
+		{
+			// should near the bounding box
+			if (box.squared_distance(point.point(point.veridx)) >= tolerance)
+				continue;
+		}
+		//std::cout << "box " << std::endl
+		//	<< box->minCor() << std::endl << box->maxCor() << std::endl;
+		Eigen::Vector3f coord;
+		TriangleEigen3f triangle;
+		{
+			int _i = 0;
+			auto const & mesh = faceref.mesh;
+			std::cout << "face " << faceref.faceidx << std::endl;
+			for (auto vid : mesh.vertices_around_face(mesh.halfedge(faceref.faceidx)))
+			{
+				triangle.vertex[_i] = faceref.point(vid);
+				_i++;
+			}
+		}
+		{
+			if (!intersection(point.point(point.veridx), triangle, tolerance, coord))
 				continue;
 		}
 		result->push_back(Pair(idx, coord));

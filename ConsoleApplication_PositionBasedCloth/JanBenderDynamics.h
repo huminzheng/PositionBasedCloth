@@ -22,6 +22,8 @@ public:
 
 	~JanBenderDynamics() {}
 
+	void addRigidBody(SurfaceMeshObject * const surfaceMeshObject);
+
 	void userSet();
 
 	void stepforward(float timeStep);
@@ -30,6 +32,7 @@ public:
 	
 private:
 	SurfaceMeshObject * const m_clothPiece;
+	std::list<SurfaceMeshObject *> m_rigidBodies;
 
 	//std::vector<SurfaceMeshObject *> m_rigidBodies;
 
