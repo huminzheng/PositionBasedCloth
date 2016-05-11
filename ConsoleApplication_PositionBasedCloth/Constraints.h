@@ -377,19 +377,19 @@ public:
 	static int TYPE_ID;
 
 	float m_distance;
-	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_vertexPosMap;
-	SurfaceMesh3f::Property_map<Veridx, float> & m_vertexInvMassMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_vertexPosMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const m_vertexInvMassMap;
 	Veridx m_v;
 	bool m_vertexMove;
-	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_facePosMap;
-	SurfaceMesh3f::Property_map<Veridx, float> & m_faceInvMassMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_facePosMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const m_faceInvMassMap;
 	Veridx m_fv1, m_fv2, m_fv3;
 	bool m_faceMove;
 
-	VertexFaceCollisionConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & vertexPosMap,
-		SurfaceMesh3f::Property_map<Veridx, float> & vertexInvMassMap,
-		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & facePosMap,
-		SurfaceMesh3f::Property_map<Veridx, float> & faceInvMassMap,
+	VertexFaceCollisionConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & vertexPosMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const & vertexInvMassMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & facePosMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const & faceInvMassMap,
 		Veridx v, Veridx fv1, Veridx fv2, Veridx fv3, 
 		bool vertexMove, bool faceMove, float distance) :
 		Constraint(4), m_vertexPosMap(vertexPosMap), m_vertexInvMassMap(vertexInvMassMap),
@@ -415,9 +415,11 @@ public:
 	SurfaceMesh3f::Property_map<Veridx, float> const & m_vertexInvMassMap;
 	Veridx m_v;
 	bool m_vertexMove;
-	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const & m_facePosMap;
+
+	// BUG error with const reference of property map
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_facePosMap;
 	//SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_faceNextPosMap;
-	SurfaceMesh3f::Property_map<Veridx, float> const & m_faceInvMassMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const m_faceInvMassMap;
 	Veridx m_fv1, m_fv2, m_fv3;
 	bool m_faceMove;
 	bool m_forward;

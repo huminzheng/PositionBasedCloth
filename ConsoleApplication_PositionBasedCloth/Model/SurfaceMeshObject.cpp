@@ -6,9 +6,9 @@
 
 const std::string SurfaceMeshObject::pname_texCoords = "v:texture_coordinates";
 const std::string SurfaceMeshObject::pname_vertexPlanarCoords = "v:vertex_planar_coordinates";
-const std::string SurfaceMeshObject::pname_vertexNormals = "v:vertex_masses";
-const std::string SurfaceMeshObject::pname_vertexMasses = "v:vertex_inversedMasses";
-const std::string SurfaceMeshObject::pname_vertexInversedMasses = "v:vertex_normals";
+const std::string SurfaceMeshObject::pname_vertexNormals = "v:vertex_normals";
+const std::string SurfaceMeshObject::pname_vertexMasses = "v:vertex_masses";
+const std::string SurfaceMeshObject::pname_vertexInversedMasses = "v:vertex_inversed_masses";
 const std::string SurfaceMeshObject::pname_vertexVelocities = "v:vertex_velocities";
 const std::string SurfaceMeshObject::pname_vertexLastPositions = "v:vertex_last_positions";
 const std::string SurfaceMeshObject::pname_vertexCurrentPositions = "v:vertex_current_positions";

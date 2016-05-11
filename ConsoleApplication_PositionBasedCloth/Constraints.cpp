@@ -1493,10 +1493,10 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 	Eigen::Vector3f & p1 = m_facePosMap[m_fv2];
 	Eigen::Vector3f & p2 = m_facePosMap[m_fv3];
 
-	float const invMass1 = m_vertexMove ? m_vertexInvMassMap[m_v] : 0.0f;
-	float const invMass2 = m_faceMove ? m_faceInvMassMap[m_fv1] : 0.0f;
-	float const invMass3 = m_faceMove ? m_faceInvMassMap[m_fv2] : 0.0f;
-	float const invMass4 = m_faceMove ? m_faceInvMassMap[m_fv3] : 0.0f;
+	float const invMass1 = m_vertexInvMassMap[m_v];
+	float const invMass2 = m_faceInvMassMap[m_fv1];
+	float const invMass3 = m_faceInvMassMap[m_fv2];
+	float const invMass4 = m_faceInvMassMap[m_fv3];
 
 	Eigen::Vector3f corr1, corr2, corr3, corr4;
 	bool res = DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(
