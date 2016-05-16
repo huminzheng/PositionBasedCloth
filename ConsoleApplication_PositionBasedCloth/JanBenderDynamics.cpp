@@ -204,6 +204,9 @@ void JanBenderDynamics::genCollConstraints()
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 
+
+
+
 #ifdef USE_CONTINUOUS_COLLISION
 	/* ---------- check continuous collision ---------- */
 	{
@@ -263,6 +266,9 @@ void JanBenderDynamics::genCollConstraints()
 	}
 #endif
 
+
+
+
 	/* ---------- check static collision ---------- */
 #ifdef USE_STATIC_COLLISION
 	{
@@ -276,11 +282,11 @@ void JanBenderDynamics::genCollConstraints()
 #ifdef USE_RIGIDBODY_COLLISION
 		for (auto * ptr : m_rigidBodies)
 		{
-			auto const & pmap = ptr->getMesh()->property_map<Veridx, PointEigen3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
-			auto const & immap = ptr->getMesh()->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses);
+			auto const & pmap = ptr->getMesh()->property_map<Veridx, PointEigen3f>(SurfaceMeshObject::pname_vertexCurrentPositions).first;
+			auto const & immap = ptr->getMesh()->property_map<Veridx, float>(SurfaceMeshObject::pname_vertexInversedMasses).first;
 			for (auto fid : ptr->getMesh()->faces())
 			{
-				spatial.insert(Face3fRef(*ptr->getMesh(), fid, pmap.first, immap.first));
+				spatial.insert(Face3fRef(*ptr->getMesh(), fid, pmap, immap));
 			}
 		}
 #endif
@@ -298,10 +304,12 @@ void JanBenderDynamics::genCollConstraints()
 			Veridx vid = *it;
 			Vertex3fRef verref(*clothMesh, vid, m_predictPositions, m_vertexInversedMasses);
 			auto candidates = spatial.candidate(verref);
-			//if (candidates.size() > 0)
-			//	std::cout << "candidates" << std::endl;
-
+			if (candidates.empty())
+				continue;
+			//std::cout << "candidates size " << candidates.size() << std::endl;
 			AABBTree<Face3fRef, PointEigen3f> faceTree(candidates);
+			//std::cout << "facetree size " << faceTree.size() << std::endl;
+			//std::cout << faceTree.at(0).second.posMap[(Veridx) 0] << std::endl;
 			auto contacts = faceTree.contactDetection<Vertex3fRef, Eigen::Vector3f>(
 				verref, 0.1f);
 
@@ -329,6 +337,7 @@ void JanBenderDynamics::genCollConstraints()
 
 	}
 #endif
+
 
 }
 

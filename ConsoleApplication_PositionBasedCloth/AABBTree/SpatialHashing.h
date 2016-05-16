@@ -98,7 +98,7 @@ public:
 					//std::cout << "insert size " << m_table.at(pos).size() << std::endl;
 					res.insert(res.end(), m_table.at(pos).begin(), m_table.at(pos).end());
 				}
-		return res;
+		return std::move(res);
 	}
 
 	

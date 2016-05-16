@@ -83,29 +83,28 @@ Face3fTree::contactDetection<Vertex3fRef, Eigen::Vector3f>
 		AABBox<PointEigen3f> const & box = iter->first;
 		Face3fRef const & faceref = iter->second;
 		float sqdis = 0.0f;
-		{
-			// should near the bounding box
-			if (box.squared_distance(point.point(point.veridx)) >= tolerance)
-				continue;
-		}
+		// should near the bounding box
+		if (box.squared_distance(point.point(point.veridx)) >= tolerance)
+			continue;
 		//std::cout << "box " << std::endl
 		//	<< box->minCor() << std::endl << box->maxCor() << std::endl;
 		Eigen::Vector3f coord;
 		TriangleEigen3f triangle;
+
+		int _i = 0;
+		auto const & mesh = faceref.mesh;
+		//std::cout << "face " << faceref.faceidx << std::endl;
+		for (auto vid : mesh.vertices_around_face(mesh.halfedge(faceref.faceidx)))
 		{
-			int _i = 0;
-			auto const & mesh = faceref.mesh;
-			std::cout << "face " << faceref.faceidx << std::endl;
-			for (auto vid : mesh.vertices_around_face(mesh.halfedge(faceref.faceidx)))
-			{
-				triangle.vertex[_i] = faceref.point(vid);
-				_i++;
-			}
+			//std::cout << "vertex id " << vid << std::endl;
+			//std::cout << "\tpos " << faceref.point(vid) << std::endl;
+			triangle.vertex[_i] = faceref.point(vid);
+			_i++;
 		}
-		{
-			if (!intersection(point.point(point.veridx), triangle, tolerance, coord))
-				continue;
-		}
+
+		if (!intersection(point.point(point.veridx), triangle, tolerance, coord))
+			continue;
+
 		result->push_back(Pair(idx, coord));
 	}
 	return result;
