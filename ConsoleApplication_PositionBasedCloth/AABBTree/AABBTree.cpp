@@ -177,6 +177,47 @@ Face3fConTree::contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>
 	return result;
 }
 
+template<> template<>
+std::list<std::pair<typename Face3fDirTree::Index, Eigen::Vector3f> > *
+Face3fDirTree::contactDetection<Vertex3fRef, Eigen::Vector3f>
+(Vertex3fRef const & point, float tolerance)
+{
+	typedef std::pair<Face3fDirTree::Index, Eigen::Vector3f> Pair;
+	std::list<Pair> * result = new std::list<Pair>();
+	Face3fDirTree::Index idx = 0;
+	for (auto iter = tree.begin(); iter != tree.end(); ++iter, ++idx)
+	{
+		AABBox<PointEigen3f> const & box = iter->first;
+		FaceNormalized3fRef const & faceref = iter->second;
+		float sqdis = 0.0f;
+		{
+			// should near the bounding box
+			if (box.squared_distance(point.point(point.veridx)) >= tolerance)
+				continue;
+		}
+		//std::cout << "box " << std::endl
+		//	<< box->minCor() << std::endl << box->maxCor() << std::endl;
+		Eigen::Vector3f coord;
+		TriangleEigen3f triangle;
+		{
+			int _i = 0;
+			auto const & mesh = faceref.mesh;
+			//std::cout << "face " << faceref.faceidx << std::endl;
+			for (auto vid : mesh.vertices_around_face(mesh.halfedge(faceref.faceidx)))
+			{
+				triangle.vertex[_i] = faceref.point(vid);
+				_i++;
+			}
+		}
+		{
+			if (!intersection(point.point(point.veridx), triangle, tolerance, coord))
+				continue;
+		}
+		result->push_back(Pair(idx, coord));
+	}
+	return result;
+}
+
 //template<> template<>
 //std::list<std::pair<typename AABBTree<Segment3f, Point3f>::Index, Eigen::Vector2f> * > *
 //AABBTree<Segment3f, Point3f>::contactDetection<Segment3f, Eigen::Vector2f>

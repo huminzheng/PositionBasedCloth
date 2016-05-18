@@ -73,9 +73,9 @@ void Simulator::init()
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
 	Eigen::Matrix4f mat;
-	mat << 1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
+	mat << 2.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 2.0f, 0.0f, -20.0f,
+		0.0f, 0.0f, 2.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
 	rigidBody->modelTransform(mat);
 

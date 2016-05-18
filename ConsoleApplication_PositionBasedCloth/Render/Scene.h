@@ -5,7 +5,6 @@
 #include "texture.h"
 #include "Camera.h"
 #include "..\Model\SurfaceMeshObject.h"
-#include "..\ContactDetection.h"
 
 #include <vector>
 

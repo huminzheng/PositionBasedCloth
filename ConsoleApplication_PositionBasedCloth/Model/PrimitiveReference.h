@@ -16,17 +16,52 @@ public:
 	 * maps vanish
 	 */
 	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const posMap;
+	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const velMap;
 	SurfaceMesh3f::Property_map<Veridx, float> const invMass;
 
 	Face3fRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
 		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const posMap,
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const velMap,
 		SurfaceMesh3f::Property_map<Veridx, float> const invMass) :
-		mesh(mesh), faceidx(faceidx), posMap(posMap), invMass(invMass) {}
+		mesh(mesh), faceidx(faceidx), posMap(posMap), velMap(velMap), invMass(invMass) {}
 
 	Face3fRef(Face3fRef && other) = default;
 	Face3fRef & operator=(Face3fRef && other) = default;
 	Face3fRef(Face3fRef const & other) = default;
 	Face3fRef & operator=(Face3fRef const & other) = delete;
+
+	PointEigen3f point(Veridx const & vid) const
+	{
+		return posMap[vid];
+	}
+
+};
+
+class FaceNormalized3fRef
+{
+public:
+	SurfaceMesh3f const & mesh;
+	Faceidx const faceidx;
+	/* NOTE use direct Property_map (which itself is a reference)
+	* to avoid the strange bug that the PrimitiveRef's (in AABBTree)
+	* maps vanish
+	*/
+	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const posMap;
+	SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const velMap;
+	SurfaceMesh3f::Property_map<Faceidx, PointEigen3f> const normalMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const invMass;
+
+	FaceNormalized3fRef(SurfaceMesh3f const & mesh, Faceidx const faceidx,
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const posMap,
+		SurfaceMesh3f::Property_map<Veridx, PointEigen3f> const velMap,
+		SurfaceMesh3f::Property_map<Faceidx, PointEigen3f> const normalMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const invMass) :
+		mesh(mesh), faceidx(faceidx), posMap(posMap), velMap(velMap), normalMap(normalMap), invMass(invMass) {}
+
+	FaceNormalized3fRef(FaceNormalized3fRef && other) = default;
+	FaceNormalized3fRef & operator=(FaceNormalized3fRef && other) = default;
+	FaceNormalized3fRef(FaceNormalized3fRef const & other) = default;
+	FaceNormalized3fRef & operator=(FaceNormalized3fRef const & other) = delete;
 
 	PointEigen3f point(Veridx const & vid) const
 	{

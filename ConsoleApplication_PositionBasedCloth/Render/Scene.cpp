@@ -456,7 +456,7 @@ const
 			glVertexAttribPointer(1, 1, GL_UNSIGNED_INT, GL_FALSE, 1 * sizeof(GLuint), (GLvoid *)0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-			glDrawArrays(GL_POINTS, 0, pointVerticesCount);
+			//glDrawArrays(GL_POINTS, 0, pointVerticesCount);
 		}
 		glBindVertexArray(0);
 

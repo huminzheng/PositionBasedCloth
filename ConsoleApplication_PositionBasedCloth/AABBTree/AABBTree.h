@@ -92,11 +92,34 @@ typedef AABBTree<Face3fRef, PointEigen3f> Face3fTree;
 
 typedef AABBTree<Face3fContinuesRef, PointEigen3f> Face3fConTree;
 
+typedef AABBTree<FaceNormalized3fRef, PointEigen3f> Face3fDirTree;
+
 struct ContinuousCollideResult
 {
 	enum {CLOSE, INTERSECTION} state;
 	float time;
 	Eigen::Vector3f coord;
 };
+
+
+template<> template<>
+std::list<std::pair<typename Face3fTree::Index, Eigen::Vector3f> > *
+Face3fTree::contactDetection<Eigen::Vector3f, Eigen::Vector3f>
+(Eigen::Vector3f const & point, float tolerance);
+
+template<> template<>
+std::list<std::pair<typename Face3fTree::Index, Eigen::Vector3f> > *
+Face3fTree::contactDetection<Vertex3fRef, Eigen::Vector3f>
+(Vertex3fRef const & point, float tolerance);
+
+template<> template<>
+std::list<std::pair<typename Face3fConTree::Index, ContinuousCollideResult> > *
+Face3fConTree::contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>
+(Vertex3fContinuesRef const & point, float tolerance);
+
+template<> template<>
+std::list<std::pair<typename Face3fDirTree::Index, Eigen::Vector3f> > *
+Face3fDirTree::contactDetection<Vertex3fRef, Eigen::Vector3f>
+(Vertex3fRef const & point, float tolerance);
 
 #endif

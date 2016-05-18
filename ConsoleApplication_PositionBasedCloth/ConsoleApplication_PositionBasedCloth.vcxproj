@@ -22,7 +22,6 @@
     <ClCompile Include="AABBTree\AABBox.cpp" />
     <ClCompile Include="AABBTree\AABBTree.cpp" />
     <ClCompile Include="Constraints.cpp" />
-    <ClCompile Include="ContactDetection.cpp" />
     <ClCompile Include="JanBenderDynamics.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model\SurfaceMeshObject.cpp" />
@@ -48,7 +47,6 @@
     <ClInclude Include="AABBTree\AABBTree.h" />
     <ClInclude Include="AABBTree\SpatialHashing.h" />
     <ClInclude Include="Constraints.h" />
-    <ClInclude Include="ContactDetection.h" />
     <ClInclude Include="JanBenderDynamics.h" />
     <ClInclude Include="Model\PrimitiveReference.h" />
     <ClInclude Include="Model\SurfaceMeshObject.h" />

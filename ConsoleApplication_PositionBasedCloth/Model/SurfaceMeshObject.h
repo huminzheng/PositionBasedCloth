@@ -42,6 +42,7 @@ public:
 	static const std::string pname_texCoords;
 	static const std::string pname_vertexPlanarCoords;
 	static const std::string pname_vertexNormals;
+	static const std::string pname_vertexEigenNormals;
 	static const std::string pname_vertexVelocities;
 	static const std::string pname_vertexMasses;
 	static const std::string pname_vertexInversedMasses;
@@ -49,6 +50,7 @@ public:
 	static const std::string pname_vertexCurrentPositions;
 	static const std::string pname_vertexPredictPositions;
 	static const std::string pname_faceNormals;
+	static const std::string pname_faceEigenNormals;
 
 	/* -------- exporters for drawing ---------- */
 	void exportPos3fNorm3fBuffer(

@@ -98,6 +98,24 @@ AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref
 }
 
 template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, FaceNormalized3fRef>(FaceNormalized3fRef const & faceref)
+{
+	auto const & mesh = faceref.mesh;
+	auto const & fid = faceref.faceidx;
+	auto range = mesh.vertices_around_face(mesh.halfedge(fid));
+	Veridx vids[3];
+	int _i = 0;
+	for (auto vid : range)
+	{
+		vids[_i] = vid;
+		_i++;
+	}
+	AABBox<PointEigen3f> box(faceref.posMap[vids[0]], faceref.posMap[vids[1]]);
+	box += faceref.posMap[vids[2]];
+	return box;
+}
+
+template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & verref)
 {
 	return AABBox<PointEigen3f>(verref.posMap[verref.veridx]);

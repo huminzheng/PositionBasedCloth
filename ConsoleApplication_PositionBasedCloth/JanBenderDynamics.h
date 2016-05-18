@@ -47,8 +47,8 @@ private:
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_vertexVelocities;
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_planarCoordinates;
 
-	SurfaceMesh3f::Property_map<Veridx, Vec3f> m_vertexNormals;
-	SurfaceMesh3f::Property_map<Faceidx, Vec3f> m_faceNormals;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_vertexEigenNormals;
+	SurfaceMesh3f::Property_map<Faceidx, Eigen::Vector3f> m_faceEigenNormals;
 
 	SurfaceMesh3f::Property_map<Veridx, float> m_vertexInversedMasses;
 	SurfaceMesh3f::Property_map<Veridx, float> m_vertexMasses;

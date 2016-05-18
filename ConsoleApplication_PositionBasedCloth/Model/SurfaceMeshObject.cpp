@@ -7,6 +7,7 @@
 const std::string SurfaceMeshObject::pname_texCoords = "v:texture_coordinates";
 const std::string SurfaceMeshObject::pname_vertexPlanarCoords = "v:vertex_planar_coordinates";
 const std::string SurfaceMeshObject::pname_vertexNormals = "v:vertex_normals";
+const std::string SurfaceMeshObject::pname_vertexEigenNormals = "v:vertex_eigen_normals";
 const std::string SurfaceMeshObject::pname_vertexMasses = "v:vertex_masses";
 const std::string SurfaceMeshObject::pname_vertexInversedMasses = "v:vertex_inversed_masses";
 const std::string SurfaceMeshObject::pname_vertexVelocities = "v:vertex_velocities";
@@ -14,6 +15,7 @@ const std::string SurfaceMeshObject::pname_vertexLastPositions = "v:vertex_last_
 const std::string SurfaceMeshObject::pname_vertexCurrentPositions = "v:vertex_current_positions";
 const std::string SurfaceMeshObject::pname_vertexPredictPositions = "v:vertex_predict_positions";
 const std::string SurfaceMeshObject::pname_faceNormals = "v:face_normals";
+const std::string SurfaceMeshObject::pname_faceEigenNormals = "v:face_eigen_normals";
 
 void SurfaceMeshObject::import(const Mesh mesh)
 {
@@ -41,15 +43,15 @@ void SurfaceMeshObject::import(const Mesh mesh)
 	{
 		texCoords[vindices2vhandles[_i]] = Point3f(mesh.vertices[_i].TexCoords[0], mesh.vertices[_i].TexCoords[1], 0.0f);
 	}
-	/* compute face normal */
-	/* generate vertex normal conditioning on face normal */
-	//PolyArrayMesh & mesh = *PolyMesh;
-	SurfaceMesh3f::Property_map<Faceidx, Vec3f> faceNormals =
-		PolyMesh->add_property_map<Faceidx, Vec3f>(pname_faceNormals, CGAL::NULL_VECTOR).first;
-	SurfaceMesh3f::Property_map<Veridx, Vec3f> vertexNormals =
-		PolyMesh->add_property_map<Veridx, Vec3f>(pname_vertexNormals, CGAL::NULL_VECTOR).first;
-	CGAL::Polygon_mesh_processing::compute_normals(*PolyMesh, vertexNormals, faceNormals,
-		CGAL::Polygon_mesh_processing::parameters::vertex_point_map(PolyMesh->points()).geom_traits(Kernelf()));
+	///* compute face normal */
+	///* generate vertex normal conditioning on face normal */
+	////PolyArrayMesh & mesh = *PolyMesh;
+	//SurfaceMesh3f::Property_map<Faceidx, Vec3f> faceNormals =
+	//	PolyMesh->add_property_map<Faceidx, Vec3f>(pname_faceNormals, CGAL::NULL_VECTOR).first;
+	//SurfaceMesh3f::Property_map<Veridx, Vec3f> vertexNormals =
+	//	PolyMesh->add_property_map<Veridx, Vec3f>(pname_vertexNormals, CGAL::NULL_VECTOR).first;
+	//CGAL::Polygon_mesh_processing::compute_normals(*PolyMesh, vertexNormals, faceNormals,
+	//	CGAL::Polygon_mesh_processing::parameters::vertex_point_map(PolyMesh->points()).geom_traits(Kernelf()));
 
 	/* initial sizes */
 	VERTEX_SIZE = PolyMesh->number_of_vertices();
@@ -126,6 +128,7 @@ void SurfaceMeshObject::setPositions(Eigen::VectorXf const & positions)
 
 void SurfaceMeshObject::refreshNormals()
 {	
+	/* refresh normals */
 	SurfaceMesh3f::Property_map<Faceidx, Vec3f> faceNormals;
 	SurfaceMesh3f::Property_map<Veridx, Vec3f> vertexNormals;
 
@@ -144,6 +147,28 @@ void SurfaceMeshObject::refreshNormals()
 	CGAL::Polygon_mesh_processing::compute_normals(*PolyMesh, vertexNormals, faceNormals,
 		CGAL::Polygon_mesh_processing::parameters::vertex_point_map(PolyMesh->points()).geom_traits(Kernelf()));
 
+	/* update to eigen vector normals */
+	SurfaceMesh3f::Property_map<Faceidx, Eigen::Vector3f> eigenFaceNormals;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> eigenVertexNormals;
+
+	auto eigenfnormals = PolyMesh->property_map<Faceidx, Eigen::Vector3f>(pname_faceEigenNormals);
+	if (eigenfnormals.second) eigenFaceNormals = eigenfnormals.first;
+	else eigenFaceNormals = PolyMesh->add_property_map<Faceidx, Eigen::Vector3f>(pname_faceEigenNormals).first;
+
+	//CGAL::Polygon_mesh_processing::compute_face_normals(mesh, faceNormals);
+
+	auto eigenvnormals = PolyMesh->property_map<Veridx, Eigen::Vector3f>(pname_vertexEigenNormals);
+	if (eigenvnormals.second) eigenVertexNormals = eigenvnormals.first;
+	else eigenVertexNormals = PolyMesh->add_property_map<Veridx, Eigen::Vector3f>(pname_vertexEigenNormals).first;
+
+	for (auto v : PolyMesh->vertices())
+	{
+		copy_v3f(eigenVertexNormals[v], vertexNormals[v]);
+	}
+	for (auto f : PolyMesh->faces())
+	{
+		copy_v3f(eigenFaceNormals[f], faceNormals[f]);
+	}
 }
 
 /* export data for VBO and EBO for drawing */

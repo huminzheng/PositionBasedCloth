@@ -96,9 +96,6 @@
     <ClCompile Include="JanBenderDynamics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ContactDetection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Util\Geometry.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
@@ -180,9 +177,6 @@
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="JanBenderDynamics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContactDetection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PositionBasedDynamics\MathFunctions.h">

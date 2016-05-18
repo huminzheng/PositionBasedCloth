@@ -142,6 +142,9 @@ template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Face3fRef>(Face3fRef const & faceref);
 
 template <>
+AABBox<PointEigen3f> AABBoxOf<PointEigen3f, FaceNormalized3fRef>(FaceNormalized3fRef const & faceref);
+
+template <>
 AABBox<PointEigen3f> AABBoxOf<PointEigen3f, Vertex3fRef>(Vertex3fRef const & verref);
 
 template <>

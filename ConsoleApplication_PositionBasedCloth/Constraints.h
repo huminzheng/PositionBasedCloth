@@ -371,29 +371,34 @@ public:
 //	virtual bool solvePositionConstraint(SimulationModel &model);
 //};
 
-class VertexFaceCollisionConstraint : public Constraint
+class VertexFaceDistanceConstraint : public Constraint
 {
 public:
 	static int TYPE_ID;
 
 	float m_distance;
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_vertexPosMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_vertexVelocityMap;
 	SurfaceMesh3f::Property_map<Veridx, float> const m_vertexInvMassMap;
 	Veridx m_v;
 	bool m_vertexMove;
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_facePosMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_faceVelocityMap;
 	SurfaceMesh3f::Property_map<Veridx, float> const m_faceInvMassMap;
 	Veridx m_fv1, m_fv2, m_fv3;
 	bool m_faceMove;
 
-	VertexFaceCollisionConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexPosMap,
+	VertexFaceDistanceConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexPosMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexVelocityMap,
 		SurfaceMesh3f::Property_map<Veridx, float> const vertexInvMassMap,
 		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const facePosMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const faceVelocityMap,
 		SurfaceMesh3f::Property_map<Veridx, float> const faceInvMassMap,
-		Veridx v, Veridx fv1, Veridx fv2, Veridx fv3, 
+		Veridx v, Veridx fv1, Veridx fv2, Veridx fv3,
 		bool vertexMove, bool faceMove, float distance) :
-		Constraint(4), m_vertexPosMap(vertexPosMap), m_vertexInvMassMap(vertexInvMassMap),
-		m_facePosMap(facePosMap), m_faceInvMassMap(faceInvMassMap),
+		Constraint(4), 
+		m_vertexPosMap(vertexPosMap), m_vertexVelocityMap(vertexVelocityMap), m_vertexInvMassMap(vertexInvMassMap),
+		m_facePosMap(facePosMap), m_faceVelocityMap(faceVelocityMap), m_faceInvMassMap(faceInvMassMap),
 		m_v(v), m_fv1(fv1), m_fv2(fv2), m_fv3(fv3),
 		m_vertexMove(vertexMove), m_faceMove(faceMove), m_distance(distance)
 	{}
@@ -402,9 +407,10 @@ public:
 
 	virtual bool initConstraint();
 	virtual bool solvePositionConstraint();
+	virtual bool solveVelocityConstraint();
 };
 
-class VertexFaceDirectedDistanceConstraint : public Constraint
+class VertexFaceSidedDistanceConstraint : public Constraint
 {
 public:
 	static int TYPE_ID;
@@ -422,9 +428,9 @@ public:
 	SurfaceMesh3f::Property_map<Veridx, float> const m_faceInvMassMap;
 	Veridx m_fv1, m_fv2, m_fv3;
 	bool m_faceMove;
-	bool m_forward;
+	bool m_atRightSide;
 
-	VertexFaceDirectedDistanceConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexPosMap,
+	VertexFaceSidedDistanceConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexPosMap,
 		//SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & vertexNextPosMap,
 		SurfaceMesh3f::Property_map<Veridx, float> const vertexInvMassMap,
 		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const facePosMap,
@@ -437,7 +443,7 @@ public:
 		m_vertexPosMap(vertexPosMap), /*m_vertexNextPosMap(vertexNextPosMap), */m_vertexInvMassMap(vertexInvMassMap),
 		m_facePosMap(facePosMap), /*m_faceNextPosMap(faceNextPosMap), */m_faceInvMassMap(faceInvMassMap),
 		m_v(v), m_fv1(fv1), m_fv2(fv2), m_fv3(fv3),
-		m_vertexMove(vertexMove), m_faceMove(faceMove), m_forward(forward),
+		m_vertexMove(vertexMove), m_faceMove(faceMove), m_atRightSide(forward),
 		m_distance(distance), m_time(time)
 	{}
 
@@ -447,9 +453,62 @@ public:
 	virtual bool solvePositionConstraint();
 };
 
+class VertexFaceDirectedDistanceConstraint : public Constraint
+{
+public:
+	static int TYPE_ID;
+
+	float m_distance, m_time;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_vertexPosMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_vertexVelocityMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const m_vertexInvMassMap;
+	Veridx m_v;
+
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_facePosMap;
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const m_faceVelocityMap;
+	SurfaceMesh3f::Property_map<Faceidx, Eigen::Vector3f> const m_faceNormalMap;
+	SurfaceMesh3f::Property_map<Veridx, float> const m_faceInvMassMap;
+	Faceidx m_f;
+	Veridx m_fv1, m_fv2, m_fv3;
+
+	VertexFaceDirectedDistanceConstraint(
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexPosMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const vertexVelocityMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const vertexInvMassMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const facePosMap,
+		SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> const faceVelocityMap,
+		SurfaceMesh3f::Property_map<Faceidx, Eigen::Vector3f> const faceNormalMap,
+		SurfaceMesh3f::Property_map<Veridx, float> const faceInvMassMap,
+		Veridx v, Faceidx f, Veridx fv1, Veridx fv2, Veridx fv3,
+		float distance) :
+		Constraint(4),
+		m_vertexPosMap(vertexPosMap), m_vertexVelocityMap(vertexVelocityMap), m_vertexInvMassMap(vertexInvMassMap),
+		m_facePosMap(facePosMap), m_faceVelocityMap(faceVelocityMap), m_faceNormalMap(faceNormalMap), m_faceInvMassMap(faceInvMassMap),
+		m_v(v), m_f(f), m_fv1(fv1), m_fv2(fv2), m_fv3(fv3),
+		m_distance(distance)
+	{}
+
+	virtual int &getTypeId() const { return TYPE_ID; }
+
+	virtual bool initConstraint();
+	virtual bool solvePositionConstraint();
+	virtual bool solveVelocityConstraint();
+};
+
 class DirectedPositionBasedDynamics
 {
 public:
+	static bool solve_TrianglePointSidedDistanceConstraint(
+		const Eigen::Vector3f &p, float invMass,
+		const Eigen::Vector3f &p0, float invMass0,
+		const Eigen::Vector3f &p1, float invMass1,
+		const Eigen::Vector3f &p2, float invMass2,
+		const float restDist,
+		const float compressionStiffness,
+		const float stretchStiffness,
+		const bool atRightSide,
+		Eigen::Vector3f &corr, Eigen::Vector3f &corr0, Eigen::Vector3f &corr1, Eigen::Vector3f &corr2);
+
 	static bool solve_TrianglePointDirectedDistanceConstraint(
 		const Eigen::Vector3f &p, float invMass,
 		const Eigen::Vector3f &p0, float invMass0,
@@ -458,7 +517,7 @@ public:
 		const float restDist,
 		const float compressionStiffness,
 		const float stretchStiffness,
-		const bool forward,
+		const Eigen::Vector3f & normal,
 		Eigen::Vector3f &corr, Eigen::Vector3f &corr0, Eigen::Vector3f &corr1, Eigen::Vector3f &corr2);
 
 };

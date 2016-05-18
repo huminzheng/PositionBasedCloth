@@ -1,7 +1,6 @@
 #include "Constraints.h"
 #include "Util\BasicOperations.h"
 #include "Util\Geometry.h"
-#include "ContactDetection.h"
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
 
@@ -25,8 +24,9 @@ int IsometricBendingConstraint::TYPE_ID = 8;
 //int TargetPositionMotorSliderJoint::TYPE_ID = 18;
 //int TargetVelocityMotorSliderJoint::TYPE_ID = 19;
 //int EdgeEdgeDistanceConstraint::TYPE_ID = 20;
-int VertexFaceCollisionConstraint::TYPE_ID = 21;
-int VertexFaceDirectedDistanceConstraint::TYPE_ID = 22;
+int VertexFaceDistanceConstraint::TYPE_ID = 21;
+int VertexFaceSidedDistanceConstraint::TYPE_ID = 22;
+int VertexFaceDirectedDistanceConstraint::TYPE_ID = 23;
 
 ////////////////////////////////////////////////////////////////////////////
 //// BallJoint
@@ -1436,12 +1436,12 @@ bool IsometricBendingConstraint::solvePositionConstraint()
 //////////////////////////////////////////////////////////////////////////
 // VertexFaceDistanceConstraint
 //////////////////////////////////////////////////////////////////////////
-bool VertexFaceCollisionConstraint::initConstraint()
+bool VertexFaceDistanceConstraint::initConstraint()
 {
 	return true;
 }
 
-bool VertexFaceCollisionConstraint::solvePositionConstraint()
+bool VertexFaceDistanceConstraint::solvePositionConstraint()
 {
 	Eigen::Vector3f & p = m_vertexPosMap[m_v];
 	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
@@ -1478,15 +1478,24 @@ bool VertexFaceCollisionConstraint::solvePositionConstraint()
 	return true;
 }
 
+bool VertexFaceDistanceConstraint::solveVelocityConstraint()
+{
+	m_vertexVelocityMap[m_v] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv1] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv2] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv3] = Eigen::Vector3f::Zero();
+	return true;
+}
+
 //////////////////////////////////////////////////////////////////////////
-// VertexFaceDirectedDistanceConstraint
+// VertexFaceSidedDistanceConstraint
 //////////////////////////////////////////////////////////////////////////
-bool VertexFaceDirectedDistanceConstraint::initConstraint()
+bool VertexFaceSidedDistanceConstraint::initConstraint()
 {
 	return true;
 }
 
-bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
+bool VertexFaceSidedDistanceConstraint::solvePositionConstraint()
 {
 	Eigen::Vector3f & p = m_vertexPosMap[m_v];
 	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
@@ -1499,9 +1508,9 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 	float const invMass4 = m_faceInvMassMap[m_fv3];
 
 	Eigen::Vector3f corr1, corr2, corr3, corr4;
-	bool res = DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(
+	bool res = DirectedPositionBasedDynamics::solve_TrianglePointSidedDistanceConstraint(
 		p, invMass1, p0, invMass2, p1, invMass3, p2, invMass4,
-		m_distance, m_stiff, 0.0f, m_forward, corr1, corr2, corr3, corr4);
+		m_distance, m_stiff, 0.0f, m_atRightSide, corr1, corr2, corr3, corr4);
 
 	if (res)
 	{
@@ -1523,12 +1532,78 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 	return true;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// VertexFaceDirectedDistanceConstraint
+//////////////////////////////////////////////////////////////////////////
+bool VertexFaceDirectedDistanceConstraint::initConstraint()
+{
+	return true;
+}
+
+bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
+{
+	Eigen::Vector3f & p = m_vertexPosMap[m_v];
+	
+	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
+	Eigen::Vector3f & p1 = m_facePosMap[m_fv2];
+	Eigen::Vector3f & p2 = m_facePosMap[m_fv3];
+
+	Eigen::Vector3f & n = m_faceNormalMap[m_f];
+
+	float const invMass1 = m_vertexInvMassMap[m_v];
+	float const invMass2 = m_faceInvMassMap[m_fv1];
+	float const invMass3 = m_faceInvMassMap[m_fv2];
+	float const invMass4 = m_faceInvMassMap[m_fv3];
+
+	Eigen::Vector3f corr1, corr2, corr3, corr4;
+	bool res = DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(
+		p, invMass1, p0, invMass2, p1, invMass3, p2, invMass4,
+		m_distance, m_stiff, 0.0f, n, corr1, corr2, corr3, corr4);
+
+	if (res)
+	{
+		if (invMass1 != 0.0f)
+			p += corr1;
+		if (invMass2 != 0.0f)
+			p0 += corr2;
+		if (invMass3 != 0.0f)
+			p1 += corr3;
+		if (invMass4 != 0.0f)
+			p2 += corr4;
+		//std::cout << m_stiff << std::endl;
+		//std::cout << corr1 << std::endl;
+		//std::cout << corr2 << std::endl;
+		//std::cout << corr3 << std::endl;
+		//std::cout << corr4 << std::endl;
+	}
+
+	return true;
+}
+
+bool VertexFaceDirectedDistanceConstraint::solveVelocityConstraint()
+{
+	m_vertexVelocityMap[m_v] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv1] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv2] = Eigen::Vector3f::Zero();
+	m_faceVelocityMap[m_fv3] = Eigen::Vector3f::Zero();
+	return true;
+}
+
 /* solve triangle point distance constraint,
  * with forward/backward face of triangle makes difference,
  * constraint function is 
  * C(q, p1, p2, p3) = (q - p1) * n_directed_hat - h 
  */
-bool DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(const Eigen::Vector3f & p, float invMass, const Eigen::Vector3f & p0, float invMass0, const Eigen::Vector3f & p1, float invMass1, const Eigen::Vector3f & p2, float invMass2, const float restDist, const float compressionStiffness, const float stretchStiffness, const bool forward, Eigen::Vector3f & corr, Eigen::Vector3f & corr0, Eigen::Vector3f & corr1, Eigen::Vector3f & corr2)
+bool DirectedPositionBasedDynamics::solve_TrianglePointSidedDistanceConstraint(
+	const Eigen::Vector3f & p, float invMass, 
+	const Eigen::Vector3f & p0, float invMass0, 
+	const Eigen::Vector3f & p1, float invMass1, 
+	const Eigen::Vector3f & p2, float invMass2, 
+	const float restDist, 
+	const float compressionStiffness, 
+	const float stretchStiffness, 
+	const bool atRightSide, 
+	Eigen::Vector3f & corr, Eigen::Vector3f & corr0, Eigen::Vector3f & corr1, Eigen::Vector3f & corr2)
 {
 	// find barycentric coordinates of closest point on triangle
 
@@ -1585,8 +1660,109 @@ bool DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstrain
 		}
 	}
 	Eigen::Vector3f q = p0 * b0 + p1 * b1 + p2 * b2;
-	Eigen::Vector3f n = (p - q) * ((forward) ? 1.0f : -1.0f);
-	float dist = n.norm() * ((forward) ? 1.0f : -1.0f);
+	Eigen::Vector3f n = (p - q) * ((atRightSide) ? 1.0f : -1.0f);
+	float dist = n.norm() * ((atRightSide) ? 1.0f : -1.0f);
+	n.normalize();
+	float C = dist - restDist;
+	Eigen::Vector3f grad = n;
+	Eigen::Vector3f grad0 = -n * b0;
+	Eigen::Vector3f grad1 = -n * b1;
+	Eigen::Vector3f grad2 = -n * b2;
+
+	float s = invMass + invMass0 * b0*b0 + invMass1 * b1*b1 + invMass2 * b2*b2;
+	if (s == 0.0f)
+		return false;
+
+	s = C / s;
+	if (C < 0.0f)
+		s *= compressionStiffness;
+	else
+		s *= stretchStiffness;
+
+	if (s == 0.0f)
+		return false;
+
+	corr = -s * invMass * grad;
+	corr0 = -s * invMass0 * grad0;
+	corr1 = -s * invMass1 * grad1;
+	corr2 = -s * invMass2 * grad2;
+	return true;
+}
+
+/* solve triangle point distance constraint,
+* with forward/backward face of triangle makes difference,
+* constraint function is
+* C(q, p1, p2, p3) = (q - p1) * n_directed_hat - h
+*/
+bool DirectedPositionBasedDynamics::solve_TrianglePointDirectedDistanceConstraint(
+	const Eigen::Vector3f & p, float invMass,
+	const Eigen::Vector3f & p0, float invMass0,
+	const Eigen::Vector3f & p1, float invMass1,
+	const Eigen::Vector3f & p2, float invMass2,
+	const float restDist,
+	const float compressionStiffness,
+	const float stretchStiffness,
+	const Eigen::Vector3f & normal,
+	Eigen::Vector3f & corr, Eigen::Vector3f & corr0, Eigen::Vector3f & corr1, Eigen::Vector3f & corr2)
+{
+	// find barycentric coordinates of closest point on triangle
+
+	float b0 = 1.0f / 3.0f;		// for singular case
+	float b1 = b0;
+	float b2 = b0;
+
+	Eigen::Vector3f d1 = p1 - p0;
+	Eigen::Vector3f d2 = p2 - p0;
+	Eigen::Vector3f pp0 = p - p0;
+	float a = d1.dot(d1);
+	float b = d2.dot(d1);
+	float c = pp0.dot(d1);
+	float d = b;
+	float e = d2.dot(d2);
+	float f = pp0.dot(d2);
+	float det = a*e - b*d;
+
+	if (det != 0.0f) {
+		float s = (c*e - b*f) / det;
+		float t = (a*f - c*d) / det;
+		b0 = 1.0f - s - t;		// inside triangle
+		b1 = s;
+		b2 = t;
+		if (b0 < 0.0f) {		// on edge 1-2
+			Eigen::Vector3f d = p2 - p1;
+			float d2 = d.dot(d);
+			float t = (d2 == 0.0f) ? 0.5f : d.dot(p - p1) / d2;
+			if (t < 0.0f) t = 0.0f;	// on point 1
+			if (t > 1.0f) t = 1.0f;	// on point 2
+			b0 = 0.0f;
+			b1 = (1.0f - t);
+			b2 = t;
+		}
+		else if (b1 < 0.0f) {	// on edge 2-0
+			Eigen::Vector3f d = p0 - p2;
+			float d2 = d.dot(d);
+			float t = (d2 == 0.0f) ? 0.5f : d.dot(p - p2) / d2;
+			if (t < 0.0f) t = 0.0f;	// on point 2
+			if (t > 1.0f) t = 1.0f; // on point 0
+			b1 = 0.0f;
+			b2 = (1.0f - t);
+			b0 = t;
+		}
+		else if (b2 < 0.0f) {	// on edge 0-1
+			Eigen::Vector3f d = p1 - p0;
+			float d2 = d.dot(d);
+			float t = (d2 == 0.0f) ? 0.5f : d.dot(p - p0) / d2;
+			if (t < 0.0f) t = 0.0f;	// on point 0
+			if (t > 1.0f) t = 1.0f;	// on point 1
+			b2 = 0.0f;
+			b0 = (1.0f - t);
+			b1 = t;
+		}
+	}
+	Eigen::Vector3f q = p0 * b0 + p1 * b1 + p2 * b2;
+	bool atRightSide = ((p - q).transpose() * normal > 0);
+	Eigen::Vector3f n = (p - q) * ((atRightSide) ? 1.0f : -1.0f);
+	float dist = n.norm() * ((atRightSide) ? 1.0f : -1.0f);
 	n.normalize();
 	float C = dist - restDist;
 	Eigen::Vector3f grad = n;
