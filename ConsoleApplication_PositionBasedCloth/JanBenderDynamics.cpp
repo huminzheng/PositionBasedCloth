@@ -9,6 +9,7 @@
 #define USE_SHEAR_CONSTRAINTS
 #define USE_BEND_CONSRTAINTS
 
+#define USE_VELOCITY_CONSTRAINTS
 //#define USE_FIXED_POINTS
 
 #define USE_COLLISION_CONSTRAINTS
@@ -142,6 +143,9 @@ void JanBenderDynamics::addPermanentConstraints()
 	// add stretching and shearing constraints
 	for (auto eid : mesh->edges())
 	{
+		if (!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 0))) ||
+			!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 0))))
+			continue;
 		Constraint * cons = new DistanceConstraint(
 			m_planarCoordinates, m_predictPositions, m_vertexInversedMasses,
 			mesh->vertex(eid, 0), mesh->vertex(eid, 1));
@@ -195,7 +199,9 @@ void JanBenderDynamics::stepforward(float timeStep)
 		projectConstraints(m_iterCount);
 	}
 	updateStates(timeStep);
-	//velocityUpdate();
+#ifdef USE_VELOCITY_CONSTRAINTS
+	velocityUpdate();
+#endif
 	writeBack();
 }
 
@@ -215,7 +221,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float thickness = 1.f;
+	float rigidbodyThickness = 1.0f;
+	float clothThickness = 1.0f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION
@@ -250,7 +257,7 @@ void JanBenderDynamics::genCollConstraints()
 
 			AABBTree<Face3fContinuesRef, PointEigen3f> faceTree(candidates);
 			auto contacts = faceTree.contactDetection<Vertex3fContinuesRef, ContinuousCollideResult>(
-				verref, 0.1f);
+				verref, clothThickness);
 
 			for (auto contact : *contacts)
 			{
@@ -270,7 +277,7 @@ void JanBenderDynamics::genCollConstraints()
 					faceref.posMap1, faceref.invMass,
 					vid, fvid[0], fvid[1], fvid[2],
 					true, true, conInfo.state == ContinuousCollideResult::CLOSE ? true : false,
-					thickness, conInfo.time);
+					clothThickness, conInfo.time);
 				m_temporaryConstraints.push_back(cons);
 			}
 		}
@@ -320,7 +327,7 @@ void JanBenderDynamics::genCollConstraints()
 			//std::cout << "facetree size " << faceTree.size() << std::endl;
 			//std::cout << faceTree.at(0).second.posMap[(Veridx) 0] << std::endl;
 			auto contacts = faceTree.contactDetection<Vertex3fRef, Eigen::Vector3f>(
-				verref, 0.1f);
+				verref, clothThickness);
 
 			for (auto contact : *contacts)
 			{
@@ -338,7 +345,7 @@ void JanBenderDynamics::genCollConstraints()
 					m_predictPositions, m_vertexVelocities, m_vertexInversedMasses,
 					faceref.posMap, faceref.velMap, faceref.invMass,
 					vid, fvid[0], fvid[1], fvid[2],
-					true, true, thickness);
+					true, true, clothThickness);
 				m_temporaryConstraints.push_back(cons);
 			}
 		}
@@ -387,7 +394,7 @@ void JanBenderDynamics::genCollConstraints()
 			//std::cout << "facetree size " << faceTree.size() << std::endl;
 			//std::cout << faceTree.at(0).second.posMap[(Veridx) 0] << std::endl;
 			auto contacts = faceTree.contactDetection<Vertex3fRef, Eigen::Vector3f>(
-				verref, thickness);
+				verref, clothThickness);
 
 			for (auto contact : *contacts)
 			{
@@ -405,7 +412,7 @@ void JanBenderDynamics::genCollConstraints()
 					m_predictPositions, m_vertexVelocities, m_vertexInversedMasses,
 					faceref.posMap, faceref.velMap, faceref.normalMap, faceref.invMass,
 					vid, faceref.faceidx, fvid[0], fvid[1], fvid[2],
-					thickness);
+					clothThickness);
 				m_temporaryConstraints.push_back(cons);
 			}
 		}

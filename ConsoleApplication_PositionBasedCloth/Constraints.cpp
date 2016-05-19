@@ -1570,11 +1570,6 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 			p1 += corr3;
 		if (invMass4 != 0.0f)
 			p2 += corr4;
-		//std::cout << m_stiff << std::endl;
-		//std::cout << corr1 << std::endl;
-		//std::cout << corr2 << std::endl;
-		//std::cout << corr3 << std::endl;
-		//std::cout << corr4 << std::endl;
 	}
 
 	return true;
@@ -1582,10 +1577,13 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 
 bool VertexFaceDirectedDistanceConstraint::solveVelocityConstraint()
 {
-	m_vertexVelocityMap[m_v] = Eigen::Vector3f::Zero();
-	m_faceVelocityMap[m_fv1] = Eigen::Vector3f::Zero();
-	m_faceVelocityMap[m_fv2] = Eigen::Vector3f::Zero();
-	m_faceVelocityMap[m_fv3] = Eigen::Vector3f::Zero();
+	float damp = 0.9f;
+	Eigen::Vector3f normal = m_faceNormalMap[m_f];
+	Eigen::Matrix3f dof = (Eigen::Matrix3f::Identity() - normal * normal.transpose()) * damp;
+	m_vertexVelocityMap[m_v] = dof * m_vertexVelocityMap[m_v];
+	m_faceVelocityMap[m_fv1] = dof * m_faceVelocityMap[m_fv1];
+	m_faceVelocityMap[m_fv2] = dof * m_faceVelocityMap[m_fv2];
+	m_faceVelocityMap[m_fv3] = dof * m_faceVelocityMap[m_fv3];
 	return true;
 }
 

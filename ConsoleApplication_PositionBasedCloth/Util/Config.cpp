@@ -10,12 +10,15 @@ std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Models\
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Models\\SquareCloth_20m20\\Clothes.obj";
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Models\\SquareCloth_2m2\\Clothes.obj";
 
+//std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\prinmath\\bunny\\bunny_median.obj";
 //std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\prinmath\\bunny\\bunny_simple.obj";
+//std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Cube_10m10m10_smoothed\\Cube.obj";
+std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Cylinder01\\Cylinder.obj";
 //std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Cube_10m10m10\\Cube.obj";
-std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Sphere_20m10\\Sphere.obj";
+//std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Sphere_20m10\\Sphere.obj";
 //std::string const Config::spherePath = "E:\\Computer Graphics\\Materials\\Models\\Sphere01\\Sphere.obj";
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Models\\SquareCloth04\\Clothes.obj";
-//std::string const Config::modelPath = "E:/Computer Graphics/Materials/nanosuit/nanosuit.obj";
+//std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\nanosuit\\nanosuit.obj";
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\nanosuit\\nanosuit.obj";
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Huang\\model02\\test01.obj";
 //std::string const Config::modelPath = "E:\\Computer Graphics\\Materials\\Huang\\model01\\test.3DS";
