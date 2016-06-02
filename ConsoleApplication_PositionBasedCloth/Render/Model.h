@@ -21,9 +21,9 @@ class Model
 {
 public:
 	/*  成员函数   */
-	Model(const GLchar* path, aiPostProcessSteps options)
+	Model(const GLchar* path, aiPostProcessSteps options, aiComponent remove_components)
 	{
-		this->loadModel(path, options);
+		this->loadModel(path, options, remove_components);
 	}
 	void Draw(Shader shader);
 
@@ -34,7 +34,7 @@ private:
 	std::vector<Texture> textures_loaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 
 	/*  私有成员函数   */
-	void loadModel(std::string path, aiPostProcessSteps options);
+	void loadModel(std::string path, aiPostProcessSteps options, aiComponent remove_components);
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, std::string typeName);

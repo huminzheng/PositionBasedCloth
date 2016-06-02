@@ -13,7 +13,7 @@ public:
 
 	explicit Simulator():
 		viewer(new FOVControl(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f)),
-		clock(new Clock())
+		clock(new Clock(true))
 	{} 
 
 	// WARNING: should be called explicitly

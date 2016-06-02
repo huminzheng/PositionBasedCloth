@@ -59,7 +59,8 @@ void JanBenderDynamics::initial(float density)
 	for (Veridx vid : mesh->vertices())
 	{
 		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
-		m_planarCoordinates[vid] = m_planarCoordinates[vid] * 40.0f;
+		//m_planarCoordinates[vid] = m_planarCoordinates[vid] * 10.0f;
+		m_planarCoordinates[vid] = m_currentPositions[vid];
 	}
 
 	/* ----------- initial normals ---------- */
@@ -221,8 +222,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 1.0f;
-	float clothThickness = 1.0f;
+	float rigidbodyThickness = 0.15f;
+	float clothThickness = 0.15f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION

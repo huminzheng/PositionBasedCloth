@@ -16,12 +16,13 @@ void Model::Draw(Shader shader)
 		this->meshes[i].Draw(shader);
 }
 
-void Model::loadModel(std::string path, aiPostProcessSteps options)
+void Model::loadModel(std::string path, aiPostProcessSteps options, aiComponent remove_components)
 {
 	std::cout << "INFO::LOAD MODEL:: " << path.c_str() << std::endl;
 
 	// Read file via ASSIMP
 	Assimp::Importer importer;
+	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, remove_components);
 	const aiScene* scene = importer.ReadFile(path, options);
 	//const aiScene* scene = importer.ReadFile(path, /*aiProcess_Triangulate | */aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 	// Check for errors
@@ -74,10 +75,13 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 		vector.z = mesh->mVertices[i].z;
 		vertex.Position = vector;
 		// Normals
-		vector.x = mesh->mNormals[i].x;
-		vector.y = mesh->mNormals[i].y;
-		vector.z = mesh->mNormals[i].z;
-		vertex.Normal = vector;
+		if (mesh->mNormals)
+		{
+			vector.x = mesh->mNormals[i].x;
+			vector.y = mesh->mNormals[i].y;
+			vector.z = mesh->mNormals[i].z;
+			vertex.Normal = vector;
+		}
 		// Texture Coordinates
 		if (mesh->mTextureCoords[0]) // Does the mesh contain texture coordinates?
 		{

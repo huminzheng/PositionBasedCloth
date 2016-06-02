@@ -5,6 +5,8 @@
 #include "Util\Config.h"
 #include "Render\EventManager.h"
 
+#define USE_RIGIDBODY
+
 void Simulator::run()
 {
 	while (!Screen::closed())
@@ -51,11 +53,12 @@ void Simulator::init()
 
 	// ----------- Load cloth model ----------------
 	Model ourModel((GLchar *)Config::modelPath.c_str(), 
-		(aiPostProcessSteps)(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices));
+		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices | aiProcess_RemoveComponent),
+		aiComponent(aiComponent_NORMALS));
 	
 	clothPiece = new SurfaceMeshObject(3);
 	clothPiece->import(ourModel.getMeshes()[0]);
-
+	clothPiece->refreshNormals();
 
 	auto env = new SceneEnv(ResourceManager::GetShader("background_cube"),
 		ResourceManager::GetCubeMap("background_texture"), viewer->getCamera());
@@ -68,20 +71,22 @@ void Simulator::init()
 	//	viewer->getCamera()));
 
 	// ----------- Load rigid model ----------------
-	Model rigidBodyModel((GLchar *)Config::spherePath.c_str(),
-		(aiPostProcessSteps)(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices));
+#ifdef USE_RIGIDBODY
+	Model rigidBodyModel(
+		(GLchar *)Config::spherePath.c_str(),
+		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices), 
+		aiComponent(0x00));
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
-	Eigen::Matrix4f mat;
-	mat << 6.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 6.0f, 0.0f, -20.0f,
-		0.0f, 0.0f, 6.0f, 0.0f,
+	rigidBody->refreshNormals();
+	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+	mat << 1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
 	rigidBody->modelTransform(mat);
 
-	jbDynamics = new JanBenderDynamics(clothPiece);
-	jbDynamics->addRigidBody(rigidBody);
-	
+
 	auto sph = new SceneRigidBody(ResourceManager::GetShader("rigid_body"),
 		rigidBody, viewer->getCamera());
 	Scene::add_component(sph);
@@ -89,7 +94,16 @@ void Simulator::init()
 	contactSceneIndex = Scene::add_component(new SceneContact(
 		ResourceManager::GetShader("bounding_box"), ResourceManager::GetShader("contact_point"),
 		viewer->getCamera()));
+#endif
 
+
+	// ----------- Load dynamics ----------------
+	jbDynamics = new JanBenderDynamics(clothPiece);
+#ifdef USE_RIGIDBODY
+	jbDynamics->addRigidBody(rigidBody);
+#endif	
+
+	// ----------- Load scene ----------------
 	Scene::load();
 
 	// ------------ register event handlers ------------
@@ -115,9 +129,10 @@ void Simulator::updateData()
 	//contactHandler = new OtaduyContact(clothPiece, rigidBody);
 	//contactHandler->pointTriangleDetection(0.1f);
 	//contactHandler->edgeEdgeDetection(0.1f);
+#ifdef USE_RIGIDBODY
 	(dynamic_cast<SceneContact *>(Scene::get_component(contactSceneIndex)))
 		->setContacts(buffer, typeBuffer, size);
-
+#endif
 }
 
 void Simulator::pauseEventHandle(bool const * const keyMask)

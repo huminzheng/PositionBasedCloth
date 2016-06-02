@@ -8,8 +8,8 @@
 class Clock
 {
 public:
-	Clock() :
-		isPaused(false)
+	Clock(bool isPaused = false) :
+		isPaused(isPaused)
 	{ }
 
 	void pause()
