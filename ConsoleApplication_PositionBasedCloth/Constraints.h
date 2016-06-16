@@ -257,7 +257,10 @@ public:
 		Veridx v1, Veridx v2, Veridx v3, Veridx v4) :
 		Constraint(4), m_posMap(posMap), m_invMassMap(invMassMap),
 		m_v1(v1), m_v2(v2), m_v3(v3), m_v4(v4)
-	{}
+	{
+		initConstraint();
+		m_stiff = 1.0f;
+	}
 
 	virtual int &getTypeId() const { return TYPE_ID; }
 

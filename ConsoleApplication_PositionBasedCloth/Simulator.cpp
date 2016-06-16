@@ -80,9 +80,13 @@ void Simulator::init()
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
 	rigidBody->refreshNormals();
 	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-	mat << 1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
+	//mat << 1.0f, 0.0f, 0.0f, 0.0f,
+	//	0.0f, 1.0f, 0.0f, 0.0f,
+	//	0.0f, 0.0f, 1.0f, 0.0f,
+	//	0.0f, 0.0f, 0.0f, 1.0f;
+	mat << 5.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 5.0f, 0.0f, -6.0f,
+		0.0f, 0.0f, 5.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
 	rigidBody->modelTransform(mat);
 

@@ -904,6 +904,11 @@ bool DistanceConstraint::solvePositionConstraint()
 		x1, invMass1, x2, invMass2,
 		m_restLength, m_stiff, m_stiff, corr1, corr2);
 
+	//if (corr1.squaredNorm() > 1e-4 || corr2.squaredNorm() > 1e-4)
+	//{
+	//	std::cout << "correction too large between " << m_v1 << " " << m_v2 << std::endl;
+	//}
+
 	if (res)
 	{
 		if (invMass1 != 0.0f)

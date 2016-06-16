@@ -58,9 +58,9 @@ void JanBenderDynamics::initial(float density)
 		mesh->property_map<Veridx, Point3f>(SurfaceMeshObject::pname_texCoords).first;
 	for (Veridx vid : mesh->vertices())
 	{
-		copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
+		//copy_v3f(m_planarCoordinates[vid], texCoords[vid]);
 		//m_planarCoordinates[vid] = m_planarCoordinates[vid] * 10.0f;
-		m_planarCoordinates[vid] = m_currentPositions[vid];
+		m_planarCoordinates[vid] = m_currentPositions[vid]/* * 0.7f*/;
 	}
 
 	/* ----------- initial normals ---------- */
@@ -144,12 +144,14 @@ void JanBenderDynamics::addPermanentConstraints()
 	// add stretching and shearing constraints
 	for (auto eid : mesh->edges())
 	{
-		if (!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 0))) ||
-			!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 0))))
+		Veridx v1 = mesh->vertex(eid, 0);
+		Veridx v2 = mesh->vertex(eid, 1);
+		if (!mesh->has_valid_index(v1) || !mesh->has_valid_index(v2))
 			continue;
+
 		Constraint * cons = new DistanceConstraint(
 			m_planarCoordinates, m_predictPositions, m_vertexInversedMasses,
-			mesh->vertex(eid, 0), mesh->vertex(eid, 1));
+			v1, v2);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -158,14 +160,22 @@ void JanBenderDynamics::addPermanentConstraints()
 	// add isometric bending constraints
 	for (auto eid : mesh->edges())
 	{
-		Veridx v1 = mesh->vertex(mesh->next_around_target(mesh->halfedge(eid, 0)), 1);
+		if (!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 0))) ||
+			!mesh->has_valid_index(mesh->face(mesh->halfedge(eid, 1))))
+			continue;
+
+		Veridx v1 = mesh->vertex(mesh->next_around_target(mesh->halfedge(eid, 0)), 0);
 		Veridx v2 = mesh->vertex(eid, 0);
 		Veridx v3 = mesh->vertex(eid, 1);
 		Veridx v4 = mesh->vertex(mesh->next_around_target(mesh->halfedge(eid, 1)), 1);
 
+		if (!mesh->has_valid_index(v1) || !mesh->has_valid_index(v2) ||
+			!mesh->has_valid_index(v3) || !mesh->has_valid_index(v4))
+			continue;
+
 		Constraint * cons = new IsometricBendingConstraint(
 			m_predictPositions, m_vertexInversedMasses,
-			v1, v2, v3, v4);
+			v1, v4, v2, v3);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -190,10 +200,24 @@ void JanBenderDynamics::stepforward(float timeStep)
 	std::cout << " ------------ new step ------------ " << std::endl;
 	m_temporaryConstraints.clear();
 
+	//for (auto vid : m_clothPiece->getMesh()->vertices())
+	//{
+	//	auto offset = m_predictPositions[vid] - m_currentPositions[vid];
+	//	if (offset.squaredNorm() > 1e-20)
+	//		std::cout << "offset invalid at " << vid << std::endl;
+	//}
+	
 	freeForward(timeStep);
 	
+	//for (auto vid : m_clothPiece->getMesh()->vertices())
+	//{
+	//	Eigen::Vector3f offset = m_predictPositions[vid] - m_currentPositions[vid];
+	//	if ((offset - Eigen::Vector3f(0.0f, -0.01f, 0.0f)).squaredNorm() > 1e-5)
+	//		std::cout << "offset invalid at " << vid << std::endl;
+	//}
+
 #ifdef USE_COLLISION_CONSTRAINTS
-	genCollConstraints();
+ 	genCollConstraints();
 #endif
 	for (unsigned int _i = 0; _i < m_iterCount; ++_i)
 	{
@@ -215,6 +239,10 @@ void JanBenderDynamics::freeForward(float timeStep)
 		v += timeStep * m_vertexInversedMasses[vid] * f_ext;
 		m_vertexVelocities[vid] = v;
 		m_predictPositions[vid] = m_currentPositions[vid] + timeStep * v;
+
+		//Eigen::Vector3f vsq = (v - timeStep * f_ext);
+		//if (vsq.squaredNorm() > 1e-10)
+		//	std::cout << "velocity invalid " << vid << " with v = " << vsq.squaredNorm() << std::endl;
 	}
 }
 
@@ -222,8 +250,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 0.15f;
-	float clothThickness = 0.15f;
+	float rigidbodyThickness = 0.50f;
+	float clothThickness = 0.50f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION
