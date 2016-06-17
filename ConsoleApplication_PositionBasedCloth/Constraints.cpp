@@ -1021,14 +1021,14 @@ bool IsometricBendingConstraint::solvePositionConstraint()
 	Eigen::Vector3f & x3 = m_posMap[m_v3];
 	Eigen::Vector3f & x4 = m_posMap[m_v4];
 
-	if ((x1 - x2).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
-		(x2 - x3).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
-		(x3 - x1).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
-		(x3 - x4).norm() <= DISTANCE_OVERLAP_THRESHOLD ||
-		(x4 - x2).norm() <= DISTANCE_OVERLAP_THRESHOLD)
-	{
-		return true;
-	}
+	//if ((x1 - x2).squaredNorm() <= DISTANCE_OVERLAP_THRESHOLD ||
+	//	(x2 - x3).squaredNorm() <= DISTANCE_OVERLAP_THRESHOLD ||
+	//	(x3 - x1).squaredNorm() <= DISTANCE_OVERLAP_THRESHOLD ||
+	//	(x3 - x4).squaredNorm() <= DISTANCE_OVERLAP_THRESHOLD ||
+	//	(x4 - x2).squaredNorm() <= DISTANCE_OVERLAP_THRESHOLD)
+	//{
+	//	return false;
+	//}
 
 	float const invMass1 = m_invMassMap[m_v1];
 	float const invMass2 = m_invMassMap[m_v2];

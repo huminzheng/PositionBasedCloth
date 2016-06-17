@@ -58,6 +58,14 @@ void Simulator::init()
 	
 	clothPiece = new SurfaceMeshObject(3);
 	clothPiece->import(ourModel.getMeshes()[0]);
+
+	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+	mat << 5.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 5.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 5.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f;
+	clothPiece->modelTransform(mat);
+
 	clothPiece->refreshNormals();
 
 	auto env = new SceneEnv(ResourceManager::GetShader("background_cube"),
@@ -79,7 +87,6 @@ void Simulator::init()
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
 	rigidBody->refreshNormals();
-	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
 	//mat << 1.0f, 0.0f, 0.0f, 0.0f,
 	//	0.0f, 1.0f, 0.0f, 0.0f,
 	//	0.0f, 0.0f, 1.0f, 0.0f,

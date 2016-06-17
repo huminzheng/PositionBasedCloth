@@ -7,7 +7,8 @@ std::string const Config::modelPath =
 //"E:\\Computer Graphics\\Materials\\Models\\BodyClothCouple01\\tshirt.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\SquareClothLarge01\\Clothes.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\SquareCloth_100m100\\Clothes.obj";
-"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\SquareGarment\\Garment.obj";
+//"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\SquareGarment\\Garment_1d5.obj";
+"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\TriangularCloth\\Cloth_50m50.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\SquareCloth_50m50\\Clothes.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\SquareCloth_30m30\\Clothes.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\temp\\QuadPlane.obj";
@@ -23,7 +24,7 @@ std::string const Config::spherePath =
 //"E:\\Computer Graphics\\Materials\\Models\\Cube_10m10m10_smoothed\\Cube.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Cylinder01\\Cylinder.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Cube_10m10m10\\Cube.obj";
-"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere_20m10\\Sphere.obj";
+"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere\\Sphere_40m20.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere01\\Sphere.obj";
 
 //"E:\\Computer Graphics\\Materials\\nanosuit\\nanosuit.obj";

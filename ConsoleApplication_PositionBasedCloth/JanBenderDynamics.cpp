@@ -250,8 +250,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 0.50f;
-	float clothThickness = 0.50f;
+	float rigidbodyThickness = 1.00f;
+	float clothThickness = 1.00f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION
