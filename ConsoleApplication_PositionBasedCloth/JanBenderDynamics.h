@@ -53,7 +53,7 @@ private:
 	SurfaceMesh3f::Property_map<Veridx, float> m_vertexInversedMasses;
 	SurfaceMesh3f::Property_map<Veridx, float> m_vertexMasses;
 		
-	Eigen::Vector3f f_ext = Eigen::Vector3f(0.0f, -1.0f, 0.0f);
+	Eigen::Vector3f f_ext = Eigen::Vector3f(0.0f,-0.5f, 0.0f);
 	
 	void initial(float density);
 
