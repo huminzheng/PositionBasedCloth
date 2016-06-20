@@ -268,21 +268,41 @@ public:
 	virtual bool solvePositionConstraint();
 };
 
-//class FEMTriangleConstraint : public Constraint
-//{
-//public:
-//	static int TYPE_ID;
-//	float m_area;
-//	Eigen::Matrix2f m_invRestMat;
-//
-//	FEMTriangleConstraint() : Constraint(3) {}
-//	virtual int &getTypeId() const { return TYPE_ID; }
-//
-//	virtual bool initConstraint(SimulationModel &model, const unsigned int particle1, const unsigned int particle2,
-//		const unsigned int particle3);
-//	virtual bool solvePositionConstraint(SimulationModel &model);
-//};
-//
+class FEMTriangleConstraint : public Constraint
+{
+public:
+	static int TYPE_ID;
+	
+	float m_area;
+	Eigen::Matrix2f m_invRestMat;
+
+	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & m_posMap;
+	SurfaceMesh3f::Property_map<Veridx, float> & m_invMassMap;
+	Veridx m_v1, m_v2, m_v3;
+	
+	float m_stiff_xx, m_stiff_yy, m_stiff_xy;
+	float m_possion_ration_xy, m_possion_ration_yx;
+
+	FEMTriangleConstraint(SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> & posMap,
+		SurfaceMesh3f::Property_map<Veridx, float> & invMassMap,
+		Veridx v1, Veridx v2, Veridx v3,
+		float stiff_xx, float stiff_yy, float stiff_xy,
+		float possion_ration_xy, float possion_ration_yx) :
+		Constraint(3), m_posMap(posMap), m_invMassMap(invMassMap),
+		m_v1(v1), m_v2(v2), m_v3(v3),
+		m_stiff_xx(stiff_xx), m_stiff_yy(stiff_yy), m_stiff_xy(stiff_xy),
+		m_possion_ration_xy(possion_ration_xy), m_possion_ration_yx(possion_ration_yx)
+	{
+		initConstraint();
+		m_stiff = 0.9f;
+	}
+
+	virtual int &getTypeId() const { return TYPE_ID; }
+
+	virtual bool initConstraint();
+	virtual bool solvePositionConstraint();
+};
+
 //class StrainTriangleConstraint : public Constraint
 //{
 //public:

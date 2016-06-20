@@ -5,8 +5,9 @@
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
 
-#define USE_STRETCH_CONSTRAINTS
-#define USE_SHEAR_CONSTRAINTS
+//#define USE_STRETCH_CONSTRAINTS
+//#define USE_SHEAR_CONSTRAINTS
+#define USE_FEM_TRIANGLE_CONSTRAINTS
 #define USE_BEND_CONSRTAINTS
 
 #define USE_VELOCITY_CONSTRAINTS
@@ -152,6 +153,28 @@ void JanBenderDynamics::addPermanentConstraints()
 		Constraint * cons = new DistanceConstraint(
 			m_planarCoordinates, m_predictPositions, m_vertexInversedMasses,
 			v1, v2);
+		m_permanentConstraints.push_back(cons);
+	}
+#endif
+
+#if defined(USE_FEM_TRIANGLE_CONSTRAINTS)
+	// add fem based triangle constraints
+	for (auto fid : mesh->faces())
+	{
+		Veridx v[3];
+		int _i = 0;
+		for (auto vid : mesh->vertices_around_face(mesh->halfedge(fid)))
+		{
+			v[_i] = vid;
+			++_i;
+		}
+		if (!mesh->has_valid_index(v[0]) || !mesh->has_valid_index(v[1]) || !mesh->has_valid_index(v[2]))
+			continue;
+
+		Constraint * cons = new FEMTriangleConstraint(
+			m_predictPositions, m_vertexInversedMasses,
+			v[0], v[1], v[2],
+			1.0f, 1.0f, 1.0f, 0.2f, 0.2f);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif

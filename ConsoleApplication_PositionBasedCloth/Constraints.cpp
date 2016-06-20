@@ -12,7 +12,7 @@
 int DistanceConstraint::TYPE_ID = 6;
 //int DihedralConstraint::TYPE_ID = 7;
 int IsometricBendingConstraint::TYPE_ID = 8;
-//int FEMTriangleConstraint::TYPE_ID = 9;
+int FEMTriangleConstraint::TYPE_ID = 9;
 //int StrainTriangleConstraint::TYPE_ID = 10;
 //int VolumeConstraint::TYPE_ID = 11;
 //int FEMTetConstraint::TYPE_ID = 12;
@@ -1055,68 +1055,52 @@ bool IsometricBendingConstraint::solvePositionConstraint()
 	return res;
 }
 
-////////////////////////////////////////////////////////////////////////////
-//// FEMTriangleConstraint
-////////////////////////////////////////////////////////////////////////////
-//bool FEMTriangleConstraint::initConstraint(SimulationModel &model, const unsigned int particle1, const unsigned int particle2,
-//	const unsigned int particle3)
-//{
-//	m_bodies[0] = particle1;
-//	m_bodies[1] = particle2;
-//	m_bodies[2] = particle3;
-//
-//	ParticleData &pd = model.getParticles();
-//
-//	Eigen::Vector3f &x1 = pd.getPosition0(particle1);
-//	Eigen::Vector3f &x2 = pd.getPosition0(particle2);
-//	Eigen::Vector3f &x3 = pd.getPosition0(particle3);
-//
-//	return PositionBasedDynamics::init_FEMTriangleConstraint(x1, x2, x3, m_area, m_invRestMat);
-//}
-//
-//bool FEMTriangleConstraint::solvePositionConstraint(SimulationModel &model)
-//{
-//	ParticleData &pd = model.getParticles();
-//
-//	const unsigned i1 = m_bodies[0];
-//	const unsigned i2 = m_bodies[1];
-//	const unsigned i3 = m_bodies[2];
-//
-//	Eigen::Vector3f &x1 = pd.getPosition(i1);
-//	Eigen::Vector3f &x2 = pd.getPosition(i2);
-//	Eigen::Vector3f &x3 = pd.getPosition(i3);
-//
-//	const float invMass1 = pd.getInvMass(i1);
-//	const float invMass2 = pd.getInvMass(i2);
-//	const float invMass3 = pd.getInvMass(i3);
-//
-//	Eigen::Vector3f corr1, corr2, corr3;
-//	const bool res = PositionBasedDynamics::solve_FEMTriangleConstraint(
-//		x1, invMass1,
-//		x2, invMass2,
-//		x3, invMass3,
-//		m_area,
-//		m_invRestMat,
-//		model.getClothXXStiffness(),
-//		model.getClothYYStiffness(),
-//		model.getClothXYStiffness(),
-//		model.getClothXYPoissonRatio(),
-//		model.getClothYXPoissonRatio(),
-//		corr1, corr2, corr3);
-//
-//	if (res)
-//	{
-//		if (invMass1 != 0.0f)
-//			x1 += corr1;
-//		if (invMass2 != 0.0f)
-//			x2 += corr2;
-//		if (invMass3 != 0.0f)
-//			x3 += corr3;
-//	}
-//	return res;
-//}
-//
-//
+//////////////////////////////////////////////////////////////////////////
+// FEMTriangleConstraint
+//////////////////////////////////////////////////////////////////////////
+bool FEMTriangleConstraint::initConstraint()
+{
+	Eigen::Vector3f &x1 = m_posMap[m_v1];
+	Eigen::Vector3f &x2 = m_posMap[m_v2];
+	Eigen::Vector3f &x3 = m_posMap[m_v3];
+
+	return PBD::PositionBasedDynamics::init_FEMTriangleConstraint(x1, x2, x3, m_area, m_invRestMat);
+}
+
+bool FEMTriangleConstraint::solvePositionConstraint()
+{
+	Eigen::Vector3f &x1 = m_posMap[m_v1];
+	Eigen::Vector3f &x2 = m_posMap[m_v2];
+	Eigen::Vector3f &x3 = m_posMap[m_v3];
+
+	float const invMass1 = m_invMassMap[m_v1];
+	float const invMass2 = m_invMassMap[m_v2];
+	float const invMass3 = m_invMassMap[m_v3];
+
+	Eigen::Vector3f corr1, corr2, corr3;
+	const bool res = PBD::PositionBasedDynamics::solve_FEMTriangleConstraint(
+		x1, invMass1,
+		x2, invMass2,
+		x3, invMass3,
+		m_area,
+		m_invRestMat,
+		m_stiff_xx, m_stiff_yy, m_stiff_xy, 
+		m_possion_ration_xy, m_possion_ration_yx,
+		corr1, corr2, corr3);
+
+	if (res)
+	{
+		if (invMass1 != 0.0f)
+			x1 += corr1;
+		if (invMass2 != 0.0f)
+			x2 += corr2;
+		if (invMass3 != 0.0f)
+			x3 += corr3;
+	}
+	return res;
+}
+
+
 ////////////////////////////////////////////////////////////////////////////
 //// StrainTriangleConstraint
 ////////////////////////////////////////////////////////////////////////////
