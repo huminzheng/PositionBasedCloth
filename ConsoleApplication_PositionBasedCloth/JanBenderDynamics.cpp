@@ -221,7 +221,7 @@ void JanBenderDynamics::userSet()
 	
 	for (auto * rgptr : m_rigidBodies)
 	{
-		Eigen::Matrix3f const & rot33 = rotate_matrix(Eigen::Vector3f(0.0f, 1.0f, 0.0f), 0.3f);
+		Eigen::Matrix3f const & rot33 = rotate_matrix(Eigen::Vector3f(0.0f, 1.0f, 0.0f), 0.01f);
 		Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
 		rot.block<3, 3>(0, 0) = rot33;
 		Eigen::Matrix4f trans;

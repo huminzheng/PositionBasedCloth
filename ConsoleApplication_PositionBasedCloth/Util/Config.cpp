@@ -22,9 +22,9 @@ std::string const Config::spherePath =
 //"E:\\Computer Graphics\\Materials\\Models\\prinmath\\bunny\\bunny_median.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\prinmath\\bunny\\bunny_simple.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Cube_10m10m10_smoothed\\Cube.obj";
-//"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Cylinder01\\Cylinder.obj";
+"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Cylinder\\Cylinder.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Cube_10m10m10\\Cube.obj";
-"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere\\Sphere_40m20.obj";
+//"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere\\Sphere_40m20.obj";
 //"E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\Sphere01\\Sphere.obj";
 
 //"E:\\Computer Graphics\\Materials\\nanosuit\\nanosuit.obj";

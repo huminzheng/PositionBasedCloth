@@ -91,7 +91,7 @@ void Simulator::init()
 	//	0.0f, 0.0f, 1.0f, 0.0f,
 	//	0.0f, 0.0f, 0.0f, 1.0f;
 	mat << 5.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 5.0f, 0.0f, -6.0f,
+		0.0f, 5.0f, 0.0f, -10.0f,
 		0.0f, 0.0f, 5.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
 	rigidBody->modelTransform(mat);
