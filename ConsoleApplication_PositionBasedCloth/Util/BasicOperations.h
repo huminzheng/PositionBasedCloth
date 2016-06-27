@@ -4,7 +4,7 @@
 #include "..\Render\OpenGLContext.h"
 #include "../Model/Types.h"
 
-#include <Eigen\Core>
+#include <Eigen\Dense>
 #include <Eigen\Sparse>
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -12,7 +12,17 @@
 
 #include "..\Model\SurfaceMeshObject.h"
 
-inline Eigen::Vector3f & displacement(Point3f const & dest, Point3f const & src)
+inline Eigen::Matrix3f rotate_matrix(Eigen::Vector3f axis, float theta)
+{
+	float h = theta / 2.0f;
+	Eigen::Quaternionf q;
+	q.vec() = axis.normalized() * (std::sin)(h);
+	q.w() = (std::cos)(h);
+	q.normalize();
+	return q.toRotationMatrix();
+}
+
+inline Eigen::Vector3f const & displacement(Point3f const & dest, Point3f const & src)
 {
 	return Eigen::Vector3f(
 		dest.x() - src.x(),

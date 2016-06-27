@@ -74,13 +74,15 @@ public:
 		for (Veridx vhd : PolyMesh->vertices())
 			vprop_handle[vhd] = PolyMesh->point(vhd);
 	}
+	
+	void refreshNormals();
+
+	void affine(Eigen::Matrix4f const & mat);
 
 	/* -------- getters and setters --------- */
 	Eigen::VectorXf getPositions() const;
 	void setPositions(Eigen::VectorXf const & positions);
-
-	void refreshNormals();
-
+	
 	size_t getVertexSize() { return VERTEX_SIZE; }
 	size_t getFaceSize() { return FACE_SIZE; }
 	size_t getEdgeSize() { return EDGE_SIZE; }

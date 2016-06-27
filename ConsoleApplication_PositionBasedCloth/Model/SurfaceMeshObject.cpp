@@ -171,6 +171,38 @@ void SurfaceMeshObject::refreshNormals()
 	}
 }
 
+void SurfaceMeshObject::affine(Eigen::Matrix4f const & mat)
+{
+	SurfaceMesh3f * mesh = this->PolyMesh;
+
+	/* ----------- refresh vertex positions ---------- */
+	auto & lastpos = mesh->property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexLastPositions);
+	if (!lastpos.second) lastpos = mesh->add_property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexLastPositions);
+	auto & lastpos_prop = lastpos.first;
+
+	auto & curpos = mesh->property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
+	if (!curpos.second) curpos = mesh->add_property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexCurrentPositions);
+	auto & curpos_prop = curpos.first;
+
+	auto & prepos = mesh->property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexPredictPositions);
+	if (!prepos.second) prepos = mesh->add_property_map<Veridx, Eigen::Vector3f>(SurfaceMeshObject::pname_vertexPredictPositions);
+	auto & prepos_prop = prepos.first;
+
+	for (Veridx vid : mesh->vertices())
+	{
+		Eigen::Vector4f temp = mat * Eigen::Vector4f(curpos_prop[vid].x(), curpos_prop[vid].y(), curpos_prop[vid].z(), 1.0f);
+		Eigen::Vector3f offset = temp.block<3, 1>(0, 0) - curpos_prop[vid];
+
+		lastpos_prop[vid] = lastpos_prop[vid] + offset;
+		curpos_prop[vid] = curpos_prop[vid] + offset;
+		prepos_prop[vid] = prepos_prop[vid] + offset;
+
+		copy_v3f(mesh->point(vid), curpos_prop[vid]);
+	}
+
+	this->refreshNormals();
+}
+
 /* export data for VBO and EBO for drawing */
 void SurfaceMeshObject::exportPos3fNorm3fBuffer(
 	GLfloat* & vertexBuffer, GLfloat* & vertexNormalBuffer, GLuint & vertexSize,

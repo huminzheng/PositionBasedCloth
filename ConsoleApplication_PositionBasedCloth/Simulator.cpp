@@ -64,7 +64,7 @@ void Simulator::init()
 		0.0f, 5.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 5.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
-//	clothPiece->modelTransform(mat);
+	clothPiece->modelTransform(mat);
 
 	clothPiece->refreshNormals();
 
@@ -86,7 +86,6 @@ void Simulator::init()
 		aiComponent(0x00));
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
-	rigidBody->refreshNormals();
 	//mat << 1.0f, 0.0f, 0.0f, 0.0f,
 	//	0.0f, 1.0f, 0.0f, 0.0f,
 	//	0.0f, 0.0f, 1.0f, 0.0f,
@@ -95,7 +94,9 @@ void Simulator::init()
 		0.0f, 5.0f, 0.0f, -6.0f,
 		0.0f, 0.0f, 5.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f;
-//	rigidBody->modelTransform(mat);
+	rigidBody->modelTransform(mat);
+
+	rigidBody->refreshNormals();
 
 
 	auto sph = new SceneRigidBody(ResourceManager::GetShader("rigid_body"),

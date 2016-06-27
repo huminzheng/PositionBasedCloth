@@ -174,7 +174,7 @@ void JanBenderDynamics::addPermanentConstraints()
 		Constraint * cons = new FEMTriangleConstraint(
 			m_predictPositions, m_vertexInversedMasses,
 			v[0], v[1], v[2],
-			1.0f, 1.0f, 1.0f, 0.2f, 0.2f);
+			1.0f, 1.0f, 1.0f, 0.4f, 0.4f);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -216,6 +216,22 @@ void JanBenderDynamics::userSet()
 		i += 1;
 	}
 #endif
+	static int count = 0;
+	++count;
+	
+	for (auto * rgptr : m_rigidBodies)
+	{
+		Eigen::Matrix3f const & rot33 = rotate_matrix(Eigen::Vector3f(0.0f, 1.0f, 0.0f), 0.3f);
+		Eigen::Matrix4f rot = Eigen::Matrix4f::Identity();
+		rot.block<3, 3>(0, 0) = rot33;
+		Eigen::Matrix4f trans;
+		trans << 1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.07f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f;
+		rgptr->affine(trans * rot);
+
+	}
 }
 
 void JanBenderDynamics::stepforward(float timeStep)
@@ -273,8 +289,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 0.1500f;
-	float clothThickness = 0.150f;
+	float rigidbodyThickness = 0.300f;
+	float clothThickness = 0.300f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION
