@@ -259,7 +259,7 @@ public:
 		m_v1(v1), m_v2(v2), m_v3(v3), m_v4(v4)
 	{
 		initConstraint();
-		m_stiff = 0.01f;
+		m_stiff = 0.00f;
 	}
 
 	virtual int &getTypeId() const { return TYPE_ID; }

@@ -174,7 +174,7 @@ void JanBenderDynamics::addPermanentConstraints()
 		Constraint * cons = new FEMTriangleConstraint(
 			m_predictPositions, m_vertexInversedMasses,
 			v[0], v[1], v[2],
-			1.0f, 1.0f, 1.0f, 0.4f, 0.4f);
+			1.0f, 1.0f, 1.0f, 0.1f, 0.1f);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -210,7 +210,7 @@ void JanBenderDynamics::userSet()
 #ifdef USE_FIXED_POINTS
 	for (auto vid : m_clothPiece->getMesh()->vertices())
 	{
-		if (i == 0 || i == 92)
+		if (i == 0 || i == 129)
 			//if (i == 1239 || i == 1362 || i == 1035)
 			m_vertexInversedMasses[vid] = 0.0f;
 		i += 1;
@@ -229,7 +229,7 @@ void JanBenderDynamics::userSet()
 			0.0f, 1.0f, 0.0f, 0.07f,
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f;
-		rgptr->affine(trans * rot);
+		//rgptr->affine(trans * rot);
 
 	}
 }
@@ -289,8 +289,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 0.300f;
-	float clothThickness = 0.300f;
+	float rigidbodyThickness = 0.150f;
+	float clothThickness = 0.150f;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION

@@ -53,19 +53,13 @@ void Simulator::init()
 
 	// ----------- Load cloth model ----------------
 	Model ourModel((GLchar *)Config::modelPath.c_str(), 
-		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices | aiProcess_RemoveComponent),
+		aiPostProcessSteps(aiProcess_Triangulate | /*aiProcess_FlipUVs | */aiProcess_JoinIdenticalVertices | aiProcess_RemoveComponent),
 		aiComponent(aiComponent_NORMALS));
+
+	std::array<float, 16> matdata = Config::readData<float, 16>((GLchar *)Config::matrixPath.c_str());
 	
 	clothPiece = new SurfaceMeshObject(3);
-	clothPiece->import(ourModel.getMeshes()[0]);
-
-	Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
-	mat << 5.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 5.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 5.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f;
-	clothPiece->modelTransform(mat);
-
+	clothPiece->import(ourModel.getMeshes()[0], matdata);
 	clothPiece->refreshNormals();
 
 	auto env = new SceneEnv(ResourceManager::GetShader("background_cube"),
@@ -90,11 +84,11 @@ void Simulator::init()
 	//	0.0f, 1.0f, 0.0f, 0.0f,
 	//	0.0f, 0.0f, 1.0f, 0.0f,
 	//	0.0f, 0.0f, 0.0f, 1.0f;
-	mat << 5.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, 5.0f, 0.0f, -10.0f,
-		0.0f, 0.0f, 5.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f;
-	rigidBody->modelTransform(mat);
+	//mat << 5.0f, 0.0f, 0.0f, 0.0f,
+	//	0.0f, 5.0f, 0.0f, -10.0f,
+	//	0.0f, 0.0f, 5.0f, 0.0f,
+	//	0.0f, 0.0f, 0.0f, 1.0f;
+	//rigidBody->modelTransform(mat);
 
 	rigidBody->refreshNormals();
 

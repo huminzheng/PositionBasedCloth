@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-
 const std::string SurfaceMeshObject::pname_texCoords = "v:texture_coordinates";
 const std::string SurfaceMeshObject::pname_vertexPlanarCoords = "v:vertex_planar_coordinates";
 const std::string SurfaceMeshObject::pname_vertexNormals = "v:vertex_normals";
@@ -16,6 +15,17 @@ const std::string SurfaceMeshObject::pname_vertexCurrentPositions = "v:vertex_cu
 const std::string SurfaceMeshObject::pname_vertexPredictPositions = "v:vertex_predict_positions";
 const std::string SurfaceMeshObject::pname_faceNormals = "v:face_normals";
 const std::string SurfaceMeshObject::pname_faceEigenNormals = "v:face_eigen_normals";
+
+void SurfaceMeshObject::import(const Mesh mesh, const std::array<float, 16> & matrixData)
+{
+	this->import(mesh);
+	Eigen::Matrix4f mat;
+	mat << matrixData[0], matrixData[1], matrixData[2], matrixData[3],
+		matrixData[4], matrixData[5], matrixData[6], matrixData[7],
+		matrixData[8], matrixData[9], matrixData[10], matrixData[11],
+		matrixData[12], matrixData[13], matrixData[14], matrixData[15];
+	this->modelTransform(mat);
+}
 
 void SurfaceMeshObject::import(const Mesh mesh)
 {

@@ -35,6 +35,8 @@ public:
 
 	void import(const Mesh mesh);
 
+	void import(const Mesh mesh, const std::array<float, 16> & matrixData);
+
 	void modelTransform(Eigen::Matrix4f const & matrix);
 
 	bool getVPlanarCoord3f(SurfaceMesh3f::Property_map<Veridx, Point3f> & vph);
