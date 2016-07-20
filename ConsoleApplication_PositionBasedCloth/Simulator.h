@@ -22,6 +22,7 @@ public:
 	void run();
 
 private:
+	Config * config;
 
 	SurfaceMeshObject * clothPiece;
 	SurfaceMeshObject * rigidBody;

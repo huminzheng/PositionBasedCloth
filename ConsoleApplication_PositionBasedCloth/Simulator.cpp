@@ -30,14 +30,16 @@ void Simulator::init()
 	Screen::initEnv();
 	loopCount = 0u;
 
+	config = new Config("E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\Config.json");
+
 	// ---------- Setup and compile our shaders -------------------
-	ResourceManager::LoadShader("model_loading", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\model_loading.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\model_loading.frag");
-	ResourceManager::LoadShader("background_cube", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\background_cube.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\background_cube.frag");
-	ResourceManager::LoadShader("cloth_piece", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece.frag");
-	ResourceManager::LoadShader("rigid_body", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\rigid_body.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\rigid_body.frag");
-	ResourceManager::LoadShader("cloth_piece_normal", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece_debug.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece_debug.frag", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece_debug.gs");
-	ResourceManager::LoadShader("bounding_box", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\bounding_box.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\bounding_box.frag", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\bounding_box.gs");
-	ResourceManager::LoadShader("contact_point", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\contact_point.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\contact_point.frag");
+	ResourceManager::LoadShader("model_loading", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\model_loading.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\model_loading.frag");
+	ResourceManager::LoadShader("background_cube", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\background_cube.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\background_cube.frag");
+	ResourceManager::LoadShader("cloth_piece", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\cloth_piece.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece.frag");
+	ResourceManager::LoadShader("rigid_body", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\rigid_body.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\rigid_body.frag");
+	ResourceManager::LoadShader("cloth_piece_normal", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\cloth_piece_debug.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece_debug.frag", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\cloth_piece_debug.gs");
+	ResourceManager::LoadShader("bounding_box", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\bounding_box.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\bounding_box.frag", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\bounding_box.gs");
+	ResourceManager::LoadShader("contact_point", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_PositionBasedCloth\\ConsoleApplication_PositionBasedCloth\\GLSL\\contact_point.vs", "E:\\Microsoft Visual Studio 2015\\Workspace\\ConsoleApplication_BaraffBridson\\ConsoleApplication_BaraffBridson\\contact_point.frag");
 	//ResourceManager::LoadShader("model_loading", ".\\model_loading.vs", ".\\model_loading.frag");
 	//ResourceManager::LoadShader("background_cube", ".\\background_cube.vs", ".\\background_cube.frag");
 	
@@ -52,11 +54,11 @@ void Simulator::init()
 	ResourceManager::LoadCubeMap("background_texture", faces);
 
 	// ----------- Load cloth model ----------------
-	Model ourModel((GLchar *)Config::modelPath.c_str(), 
+	Model ourModel((GLchar *)config->modelPath.c_str(), 
 		aiPostProcessSteps(aiProcess_Triangulate | /*aiProcess_FlipUVs | */aiProcess_JoinIdenticalVertices | aiProcess_RemoveComponent),
 		aiComponent(aiComponent_NORMALS));
 
-	std::array<float, 16> matdata = Config::readData<float, 16>((GLchar *)Config::matrixPath.c_str());
+	std::array<float, 16> matdata = readData<float, 16>((GLchar *)config->matrixPath.c_str());
 	
 	clothPiece = new SurfaceMeshObject(3);
 	clothPiece->import(ourModel.getMeshes()[0], matdata);
@@ -75,21 +77,11 @@ void Simulator::init()
 	// ----------- Load rigid model ----------------
 #ifdef USE_RIGIDBODY
 	Model rigidBodyModel(
-		(GLchar *)Config::spherePath.c_str(),
+		(GLchar *)config->rigidBodyPath.c_str(),
 		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices), 
 		aiComponent(0x00));
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
-	//mat << 1.0f, 0.0f, 0.0f, 0.0f,
-	//	0.0f, 1.0f, 0.0f, 0.0f,
-	//	0.0f, 0.0f, 1.0f, 0.0f,
-	//	0.0f, 0.0f, 0.0f, 1.0f;
-	//mat << 5.0f, 0.0f, 0.0f, 0.0f,
-	//	0.0f, 5.0f, 0.0f, -10.0f,
-	//	0.0f, 0.0f, 5.0f, 0.0f,
-	//	0.0f, 0.0f, 0.0f, 1.0f;
-	//rigidBody->modelTransform(mat);
-
 	rigidBody->refreshNormals();
 
 
@@ -104,7 +96,7 @@ void Simulator::init()
 
 
 	// ----------- Load dynamics ----------------
-	jbDynamics = new JanBenderDynamics(clothPiece);
+	jbDynamics = new JanBenderDynamics(clothPiece, config->parameters);
 #ifdef USE_RIGIDBODY
 	jbDynamics->addRigidBody(rigidBody);
 #endif	

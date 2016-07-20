@@ -39,7 +39,6 @@
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Util\BasicOperations.cpp" />
     <ClCompile Include="Util\BasicTypes.cpp" />
-    <ClCompile Include="Util\Config.cpp" />
     <ClCompile Include="Util\Geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -74,6 +73,7 @@
     <ClInclude Include="Util\Test.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Config.json" />
     <None Include="GLSL\background_cube.frag" />
     <None Include="GLSL\background_cube.vs" />
     <None Include="GLSL\bounding_box.frag" />
@@ -198,7 +198,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Libraries\C++\eigen-3.3-beta\Eigen;C:\Libraries\C++\assimp-3.1.1\include;C:\Libraries\C++\eigen-3.3-beta;C:\Libraries\C++\glew-1.13.0-win32\glew-1.13.0\include;C:\Libraries\C++\glfw-3.1.2.bin.WIN32\include;C:\Libraries\C++\glm-0.9.7.1\glm;C:\Libraries\C++\Simple OpenGL Image Library\src;C:\Libraries\C++\boost_1.60\include\boost-1_60;C:\Program Files %28x86%29\CGAL-4.7\include;C:\Program Files %28x86%29\CGAL-4.7\build\include;C:\Program Files %28x86%29\CGAL-4.7\auxiliary\gmp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\C++\rapidjson v1.0.2\rapidjson-master\include;C:\Libraries\C++\eigen-3.3-beta\Eigen;C:\Libraries\C++\assimp-3.1.1\include;C:\Libraries\C++\eigen-3.3-beta;C:\Libraries\C++\glew-1.13.0-win32\glew-1.13.0\include;C:\Libraries\C++\glfw-3.1.2.bin.WIN32\include;C:\Libraries\C++\glm-0.9.7.1\glm;C:\Libraries\C++\Simple OpenGL Image Library\src;C:\Libraries\C++\boost_1.60\include\boost-1_60;C:\Program Files %28x86%29\CGAL-4.7\include;C:\Program Files %28x86%29\CGAL-4.7\build\include;C:\Program Files %28x86%29\CGAL-4.7\auxiliary\gmp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

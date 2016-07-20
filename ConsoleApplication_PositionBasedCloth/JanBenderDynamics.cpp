@@ -173,8 +173,9 @@ void JanBenderDynamics::addPermanentConstraints()
 
 		Constraint * cons = new FEMTriangleConstraint(
 			m_predictPositions, m_vertexInversedMasses,
-			v[0], v[1], v[2],
-			1.0f, 1.0f, 1.0f, 0.1f, 0.1f);
+			v[0], v[1], v[2], 
+			m_params->YoungModulo_xx, m_params->YoungModulo_yy, m_params->YoungModulo_xy,
+			m_params->PoissonRation_xy, m_params->PoissonRation_yx);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -289,8 +290,8 @@ void JanBenderDynamics::freeForward(float timeStep)
 void JanBenderDynamics::genCollConstraints()
 {
 	auto clothMesh = m_clothPiece->getMesh();
-	float rigidbodyThickness = 0.150f;
-	float clothThickness = 0.150f;
+	float rigidbodyThickness = m_params->ClothThickness;
+	float clothThickness = m_params->ClothThickness;
 	auto const cor = PointEigen3f(500.0f, 500.0f, 500.0f);
 
 #ifdef USE_CONTINUOUS_COLLISION

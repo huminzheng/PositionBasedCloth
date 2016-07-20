@@ -78,9 +78,6 @@
     <ClCompile Include="Util\BasicOperations.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\Config.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="AABBTree\AABBTree.cpp">
       <Filter>Source Files\AABBTree</Filter>
     </ClCompile>
@@ -252,6 +249,9 @@
     </None>
     <None Include="GLSL\rigid_body.vs">
       <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="Config.json">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
 </Project>

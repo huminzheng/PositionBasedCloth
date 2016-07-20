@@ -4,6 +4,7 @@
 #include "Util\BasicTypes.h"
 #include "Model\SurfaceMeshObject.h"
 #include "Constraints.h"
+#include "Util\Config.h"
 
 #include <Eigen/Dense>
 
@@ -13,8 +14,8 @@
 class JanBenderDynamics
 {
 public:
-	JanBenderDynamics(SurfaceMeshObject * clothPiece) :
-		m_clothPiece(clothPiece)
+	JanBenderDynamics(SurfaceMeshObject * clothPiece, PBDParams * params) :
+		m_clothPiece(clothPiece), m_params(params)
 	{
 		initial(1.0f);
 		addPermanentConstraints();
@@ -31,6 +32,9 @@ public:
 	void exportCollisionVertices(GLfloat *& buffer, GLuint *& type, GLuint & size);
 	
 private:
+
+	PBDParams * m_params;
+
 	SurfaceMeshObject * const m_clothPiece;
 	std::list<SurfaceMeshObject *> m_rigidBodies;
 

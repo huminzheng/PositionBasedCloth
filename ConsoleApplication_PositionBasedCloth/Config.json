@@ -1,0 +1,15 @@
+{
+  "Directories": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\DressTest\\DressTest\\DressTest01.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TaggedWomanTest\\TaggedWomanTest\\Matrix_DressTest.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TaggedWomanTest\\TaggedWomanTest\\TaggedWomanTest02.obj"
+  },
+  "PBDParameters": {
+    "YoungModulo_xx": 1.0,
+    "YoungModulo_yy": 1.0,
+    "YoungModulo_xy": 1.0,
+    "PoissonRation_xy": 0.1,
+    "PoissonRation_yx": 0.1,
+    "ClothThickness": 0.15
+  }
+}
