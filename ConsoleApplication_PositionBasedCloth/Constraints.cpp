@@ -4,29 +4,29 @@
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
 
-//int BallJoint::TYPE_ID = 1;
-//int BallOnLineJoint::TYPE_ID = 2;
-//int HingeJoint::TYPE_ID = 3;
-//int UniversalJoint::TYPE_ID = 4;
-//int RigidBodyParticleBallJoint::TYPE_ID = 5;
-int DistanceConstraint::TYPE_ID = 6;
-//int DihedralConstraint::TYPE_ID = 7;
-int IsometricBendingConstraint::TYPE_ID = 8;
-int FEMTriangleConstraint::TYPE_ID = 9;
-//int StrainTriangleConstraint::TYPE_ID = 10;
-//int VolumeConstraint::TYPE_ID = 11;
-//int FEMTetConstraint::TYPE_ID = 12;
-//int StrainTetConstraint::TYPE_ID = 13;
-//int ShapeMatchingConstraint::TYPE_ID = 14;
-//int TargetAngleMotorHingeJoint::TYPE_ID = 15;
-//int TargetVelocityMotorHingeJoint::TYPE_ID = 16;
-//int SliderJoint::TYPE_ID = 17;
-//int TargetPositionMotorSliderJoint::TYPE_ID = 18;
-//int TargetVelocityMotorSliderJoint::TYPE_ID = 19;
-//int EdgeEdgeDistanceConstraint::TYPE_ID = 20;
-int VertexFaceDistanceConstraint::TYPE_ID = 21;
-int VertexFaceSidedDistanceConstraint::TYPE_ID = 22;
-int VertexFaceDirectedDistanceConstraint::TYPE_ID = 23;
+//int const BallJoint::TYPE_ID = 1;
+//int const BallOnLineJoint::TYPE_ID = 2;
+//int const HingeJoint::TYPE_ID = 3;
+//int const UniversalJoint::TYPE_ID = 4;
+//int const RigidBodyParticleBallJoint::TYPE_ID = 5;
+//int const DistanceConstraint::TYPE_ID = 6;
+//int const DihedralConstraint::TYPE_ID = 7;
+//int const IsometricBendingConstraint::TYPE_ID = 8;
+//int const FEMTriangleConstraint::TYPE_ID = 9;
+//int const StrainTriangleConstraint::TYPE_ID = 10;
+//int const VolumeConstraint::TYPE_ID = 11;
+//int const FEMTetConstraint::TYPE_ID = 12;
+//int const StrainTetConstraint::TYPE_ID = 13;
+//int const ShapeMatchingConstraint::TYPE_ID = 14;
+//int const TargetAngleMotorHingeJoint::TYPE_ID = 15;
+//int const TargetVelocityMotorHingeJoint::TYPE_ID = 16;
+//int const SliderJoint::TYPE_ID = 17;
+//int const TargetPositionMotorSliderJoint::TYPE_ID = 18;
+//int const TargetVelocityMotorSliderJoint::TYPE_ID = 19;
+//int const EdgeEdgeDistanceConstraint::TYPE_ID = 20;
+//int const VertexFaceDistanceConstraint::TYPE_ID = 21;
+//int const VertexFaceSidedDistanceConstraint::TYPE_ID = 22;
+//int const VertexFaceDirectedDistanceConstraint::TYPE_ID = 23;
 
 ////////////////////////////////////////////////////////////////////////////
 //// BallJoint
@@ -887,7 +887,7 @@ bool DistanceConstraint::initConstraint()
 	return true;
 }
 
-bool DistanceConstraint::solvePositionConstraint()
+bool DistanceConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f & x1 = m_posMap[m_v1];
 	Eigen::Vector3f & x2 = m_posMap[m_v2];
@@ -912,9 +912,9 @@ bool DistanceConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			x1 += corr1;
+			x1 += corr1 * factor;
 		if (invMass2 != 0.0f)
-			x2 += corr2;
+			x2 += corr2 * factor;
 	}
 	return res;
 }
@@ -1014,7 +1014,7 @@ bool IsometricBendingConstraint::initConstraint()
 	return PBD::PositionBasedDynamics::init_IsometricBendingConstraint(x1, x2, x3, x4, m_Q);
 }
 
-bool IsometricBendingConstraint::solvePositionConstraint()
+bool IsometricBendingConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f & x1 = m_posMap[m_v1];
 	Eigen::Vector3f & x2 = m_posMap[m_v2];
@@ -1044,13 +1044,13 @@ bool IsometricBendingConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			x1 += corr1;
+			x1 += corr1 * factor;
 		if (invMass2 != 0.0f)
-			x2 += corr2;
+			x2 += corr2 * factor;
 		if (invMass3 != 0.0f)
-			x3 += corr3;
+			x3 += corr3 * factor;
 		if (invMass4 != 0.0f)
-			x4 += corr4;
+			x4 += corr4 * factor;
 	}
 	return res;
 }
@@ -1067,7 +1067,7 @@ bool FEMTriangleConstraint::initConstraint()
 	return PBD::PositionBasedDynamics::init_FEMTriangleConstraint(x1, x2, x3, m_area, m_invRestMat);
 }
 
-bool FEMTriangleConstraint::solvePositionConstraint()
+bool FEMTriangleConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f &x1 = m_posMap[m_v1];
 	Eigen::Vector3f &x2 = m_posMap[m_v2];
@@ -1091,11 +1091,11 @@ bool FEMTriangleConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			x1 += corr1;
+			x1 += corr1 * factor;
 		if (invMass2 != 0.0f)
-			x2 += corr2;
+			x2 += corr2 * factor;
 		if (invMass3 != 0.0f)
-			x3 += corr3;
+			x3 += corr3 * factor;
 	}
 	return res;
 }
@@ -1430,7 +1430,7 @@ bool VertexFaceDistanceConstraint::initConstraint()
 	return true;
 }
 
-bool VertexFaceDistanceConstraint::solvePositionConstraint()
+bool VertexFaceDistanceConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f & p = m_vertexPosMap[m_v];
 	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
@@ -1450,13 +1450,13 @@ bool VertexFaceDistanceConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			p += corr1;
+			p += corr1 * factor;
 		if (invMass2 != 0.0f)
-			p0 += corr2;
+			p0 += corr2 * factor;
 		if (invMass3 != 0.0f)
-			p1 += corr3;
+			p1 += corr3 * factor;
 		if (invMass4 != 0.0f)
-			p2 += corr4;
+			p2 += corr4 * factor;
 		//std::cout << m_stiff << std::endl;
 		//std::cout << corr1 << std::endl;
 		//std::cout << corr2 << std::endl;
@@ -1467,7 +1467,7 @@ bool VertexFaceDistanceConstraint::solvePositionConstraint()
 	return true;
 }
 
-bool VertexFaceDistanceConstraint::solveVelocityConstraint()
+bool VertexFaceDistanceConstraint::solveVelocityConstraint() 
 {
 	m_vertexVelocityMap[m_v] = Eigen::Vector3f::Zero();
 	m_faceVelocityMap[m_fv1] = Eigen::Vector3f::Zero();
@@ -1484,7 +1484,7 @@ bool VertexFaceSidedDistanceConstraint::initConstraint()
 	return true;
 }
 
-bool VertexFaceSidedDistanceConstraint::solvePositionConstraint()
+bool VertexFaceSidedDistanceConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f & p = m_vertexPosMap[m_v];
 	Eigen::Vector3f & p0 = m_facePosMap[m_fv1];
@@ -1504,13 +1504,13 @@ bool VertexFaceSidedDistanceConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			p += corr1;
+			p += corr1 * factor;
 		if (invMass2 != 0.0f)
-			p0 += corr2;
+			p0 += corr2 * factor;
 		if (invMass3 != 0.0f)
-			p1 += corr3;
+			p1 += corr3 * factor;
 		if (invMass4 != 0.0f)
-			p2 += corr4;
+			p2 += corr4 * factor;
 		//std::cout << m_stiff << std::endl;
 		//std::cout << corr1 << std::endl;
 		//std::cout << corr2 << std::endl;
@@ -1529,7 +1529,7 @@ bool VertexFaceDirectedDistanceConstraint::initConstraint()
 	return true;
 }
 
-bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
+bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint(float factor)
 {
 	Eigen::Vector3f & p = m_vertexPosMap[m_v];
 	
@@ -1552,19 +1552,19 @@ bool VertexFaceDirectedDistanceConstraint::solvePositionConstraint()
 	if (res)
 	{
 		if (invMass1 != 0.0f)
-			p += corr1;
+			p += corr1 * factor;
 		if (invMass2 != 0.0f)
-			p0 += corr2;
+			p0 += corr2 * factor;
 		if (invMass3 != 0.0f)
-			p1 += corr3;
+			p1 += corr3 * factor;
 		if (invMass4 != 0.0f)
-			p2 += corr4;
+			p2 += corr4 * factor;
 	}
 
 	return true;
 }
 
-bool VertexFaceDirectedDistanceConstraint::solveVelocityConstraint()
+bool VertexFaceDirectedDistanceConstraint::solveVelocityConstraint() 
 {
 	float damp = 0.9f;
 	Eigen::Vector3f normal = m_faceNormalMap[m_f];

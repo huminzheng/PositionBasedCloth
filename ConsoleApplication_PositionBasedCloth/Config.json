@@ -1,15 +1,32 @@
 {
-  "Directories": {
-    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\DressTest\\DressTest\\DressTest01.obj",
-    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TaggedWomanTest\\TaggedWomanTest\\Matrix_DressTest.txt",
-    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TaggedWomanTest\\TaggedWomanTest\\TaggedWomanTest02.obj"
+  "PathGroup": "SweaterMan",
+
+  "BracesSkirt": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\BracesSkirt.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\Matrix_BracesSkirt.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\TaggedLadyTest.obj"
   },
+
+  "SweaterMan": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Sweater_TaggedManTest\\Sweater_TaggedManTest\\Sweater.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Sweater_TaggedManTest\\Sweater_TaggedManTest\\Matrix_Sweater.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\TaggedManTest.obj"
+  },
+
+  "ParamGroup": "PBDParameters",
+
   "PBDParameters": {
     "YoungModulo_xx": 1.0,
     "YoungModulo_yy": 1.0,
     "YoungModulo_xy": 1.0,
     "PoissonRation_xy": 0.1,
     "PoissonRation_yx": 0.1,
-    "ClothThickness": 0.15
+    "IsometricBendingStiff": 0.1,
+    "ClothThickness": 0.15,
+    "ProjectDistanceStiff": 0.8,
+    "ProjectIsometricBendingStiff": 0.8,
+    "ProjectFEMTriangleStiff": 0.8
   }
+
+
 }

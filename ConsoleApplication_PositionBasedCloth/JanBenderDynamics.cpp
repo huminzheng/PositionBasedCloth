@@ -199,7 +199,7 @@ void JanBenderDynamics::addPermanentConstraints()
 
 		Constraint * cons = new IsometricBendingConstraint(
 			m_predictPositions, m_vertexInversedMasses,
-			v1, v4, v2, v3);
+			v1, v4, v2, v3, m_params->IsometricBendingStiff);
 		m_permanentConstraints.push_back(cons);
 	}
 #endif
@@ -497,8 +497,27 @@ void JanBenderDynamics::projectConstraints(int iterCount)
 	//if (m_temporaryConstraints.empty())
 	for (auto cons : m_permanentConstraints)
 	{
-		cons->updateConstraint();
-		cons->solvePositionConstraint();
+		//cons->updateConstraint();
+		//cons->solvePositionConstraint();
+		//continue;
+		switch (cons->getTypeId())
+		{
+		case ConstraintType::DistanceConstraint_Type:
+			cons->updateConstraint();
+			cons->solvePositionConstraint(std::pow(m_params->ProjectDistanceStiff, 1.0f / iterCount));
+			break;
+		case ConstraintType::IsometricBendingConstraint_Type:
+			cons->updateConstraint();
+			cons->solvePositionConstraint(std::pow(m_params->ProjectIsometricBendingStiff, 1.0f / iterCount));
+			break;
+		case ConstraintType::FEMTriangleConstraint_Type:
+			//std::cout << "FEMTriangleConstraint_Type" << std::endl;
+			cons->updateConstraint();
+			cons->solvePositionConstraint(std::pow(m_params->ProjectFEMTriangleStiff, 1.0f / iterCount));
+			break;
+		default:
+			break;
+		}
 	}
 	for (int _i = 0; _i < 5; ++_i)
 	{
@@ -554,7 +573,7 @@ void JanBenderDynamics::exportCollisionVertices(GLfloat *& buffer, GLuint *& typ
 	size = 0;
 	for (auto cons : m_temporaryConstraints)
 	{
-		if (cons->getTypeId() == 21)
+		if (cons->getTypeId() == ConstraintType::VertexFaceDistanceConstraint_Type)
 		{
 			Veridx vid = ((VertexFaceDistanceConstraint *)cons)->m_v;
 			buffer[size * 3] = m_currentPositions[vid].x();
@@ -563,7 +582,7 @@ void JanBenderDynamics::exportCollisionVertices(GLfloat *& buffer, GLuint *& typ
 			type[size] = 21u;
 			size += 1;
 		}
-		else if (cons->getTypeId() == 22)
+		else if (cons->getTypeId() == ConstraintType::VertexFaceSidedDistanceConstraint_Type)
 		{
 			Veridx vid = ((VertexFaceSidedDistanceConstraint *)cons)->m_v;
 			buffer[size * 3] = m_currentPositions[vid].x();
@@ -572,7 +591,7 @@ void JanBenderDynamics::exportCollisionVertices(GLfloat *& buffer, GLuint *& typ
 			type[size] = 22u;
 			size += 1;
 		}
-		else if (cons->getTypeId() == 23)
+		else if (cons->getTypeId() == ConstraintType::VertexFaceDirectedDistanceConstraint_Type)
 		{
 			Veridx vid = ((VertexFaceDirectedDistanceConstraint *)cons)->m_v;
 			buffer[size * 3] = m_currentPositions[vid].x();

@@ -22,7 +22,13 @@ public:
 	float YoungModulo_xy;
 	float PoissonRation_xy;
 	float PoissonRation_yx;
+	float IsometricBendingStiff;
 	float ClothThickness;
+
+	float ProjectDistanceStiff;
+	float ProjectIsometricBendingStiff;
+	float ProjectFEMTriangleStiff;
+
 };
 
 class Config
@@ -55,21 +61,34 @@ private:
 		fclose(fp);
 
 		auto const & root = doc.GetObject();
-		auto const & dirs = root.FindMember("Directories")->value.GetObject();
+		
+		/* get config params */
+		auto const & entry = root.FindMember("PathGroup")->value.GetString();
+		auto const & dirs = root.FindMember(entry)->value.GetObject();
 
 		this->matrixPath = dirs.FindMember("ClothMatrixPath")->value.GetString();
 		this->rigidBodyPath = dirs.FindMember("RigidBodyModelPath")->value.GetString();
 		this->modelPath = dirs.FindMember("ClothModelPath")->value.GetString();
 
-		auto const & params = root.FindMember("PBDParameters")->value.GetObject();
+		/* get model params */
+		auto const & model = root.FindMember("ParamGroup")->value.GetString();
+		auto const & params = root.FindMember(model)->value.GetObject();
 
 		this->parameters = new PBDParams();
 		this->parameters->YoungModulo_xx = params.FindMember("YoungModulo_xx")->value.GetFloat();
 		this->parameters->YoungModulo_yy = params.FindMember("YoungModulo_yy")->value.GetFloat();
 		this->parameters->YoungModulo_xy = params.FindMember("YoungModulo_xy")->value.GetFloat();
+
 		this->parameters->PoissonRation_xy = params.FindMember("PoissonRation_xy")->value.GetFloat();
-		this->parameters->PoissonRation_yx = params.FindMember("PoissonRation_yx")->value.GetFloat();
+		this->parameters->PoissonRation_yx = params.FindMember("PoissonRation_yx")->value.GetFloat(); 
+		
+		this->parameters->IsometricBendingStiff = params.FindMember("IsometricBendingStiff")->value.GetFloat();
+		
 		this->parameters->ClothThickness = params.FindMember("ClothThickness")->value.GetFloat();
+		
+		this->parameters->ProjectDistanceStiff = params.FindMember("ProjectDistanceStiff")->value.GetFloat();
+		this->parameters->ProjectIsometricBendingStiff = params.FindMember("ProjectIsometricBendingStiff")->value.GetFloat();
+		this->parameters->ProjectFEMTriangleStiff = params.FindMember("ProjectFEMTriangleStiff")->value.GetFloat();
 	
 	}
 	
