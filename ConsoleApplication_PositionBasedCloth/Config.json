@@ -1,5 +1,5 @@
 {
-  "PathGroup": "SweaterMan",
+  "PathGroup": "ClothMan",
 
   "BracesSkirt": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\BracesSkirt.obj",
@@ -10,6 +10,18 @@
   "SweaterMan": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Sweater_TaggedManTest\\Sweater_TaggedManTest\\Sweater.obj",
     "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Sweater_TaggedManTest\\Sweater_TaggedManTest\\Matrix_Sweater.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\TaggedManTest.obj"
+  },
+
+  "ClothMan": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Cloth\\Cloth\\Cloth\\SmoothSmallCloth03.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\Cloth\\Cloth\\Cloth\\Matrix.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\TaggedManTest.obj"
+  },
+
+  "VestMan": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\VestChanged.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\Matrix.txt",
     "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\TaggedManTest.obj"
   },
 
