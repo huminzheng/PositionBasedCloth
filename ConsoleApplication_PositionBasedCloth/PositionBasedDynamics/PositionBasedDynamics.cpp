@@ -865,10 +865,12 @@ bool PositionBasedDynamics::init_FEMTriangleConstraint(
 	p[2] = Eigen::Vector2f(p2.dot(axis0_2), p2.dot(axis0_1));
 
 	Eigen::Matrix2f P;
-	P(0, 0) = p[0][0] - p[2][0];
-	P(1, 0) = p[0][1] - p[2][1];
-	P(0, 1) = p[1][0] - p[2][0];
-	P(1, 1) = p[1][1] - p[2][1];
+	P.block<2, 1>(0, 0) = p[0] - p[2];
+	P.block<2, 1>(0, 1) = p[1] - p[2];
+	//P(0, 0) = p[0][0] - p[2][0];
+	//P(1, 0) = p[0][1] - p[2][1];
+	//P(0, 1) = p[1][0] - p[2][0];
+	//P(1, 1) = p[1][1] - p[2][1];
 
 	const float det = P.determinant();
 	if (fabs(det) > eps)
@@ -904,52 +906,70 @@ bool PositionBasedDynamics::solve_FEMTriangleConstraint(
 
 	// Determine \partial x/\partial m_i
 	Eigen::Matrix<float, 3, 2> F;
-	const Eigen::Vector3f p13 = p0 - p2;
-	const Eigen::Vector3f p23 = p1 - p2;
-	F(0,0) = p13[0] * invRestMat(0,0) + p23[0] * invRestMat(1,0);
-	F(0,1) = p13[0] * invRestMat(0,1) + p23[0] * invRestMat(1,1);
-	F(1,0) = p13[1] * invRestMat(0,0) + p23[1] * invRestMat(1,0);
-	F(1,1) = p13[1] * invRestMat(0,1) + p23[1] * invRestMat(1,1);
-	F(2,0) = p13[2] * invRestMat(0,0) + p23[2] * invRestMat(1,0);
-	F(2,1) = p13[2] * invRestMat(0,1) + p23[2] * invRestMat(1,1);
+	Eigen::Matrix<float, 3, 2> Ds;
+	Ds.block<3, 1>(0, 0) = p0 - p2;
+	Ds.block<3, 1>(0, 1) = p1 - p2;
+	F = Ds * invRestMat;
+	//const Eigen::Vector3f p13 = p0 - p2;
+	//const Eigen::Vector3f p23 = p1 - p2;
+	//F(0,0) = p13[0] * invRestMat(0,0) + p23[0] * invRestMat(1,0);
+	//F(0,1) = p13[0] * invRestMat(0,1) + p23[0] * invRestMat(1,1);
+	//F(1,0) = p13[1] * invRestMat(0,0) + p23[1] * invRestMat(1,0);
+	//F(1,1) = p13[1] * invRestMat(0,1) + p23[1] * invRestMat(1,1);
+	//F(2,0) = p13[2] * invRestMat(0,0) + p23[2] * invRestMat(1,0);
+	//F(2,1) = p13[2] * invRestMat(0,1) + p23[2] * invRestMat(1,1);
 
 	// epsilon = 0.5(F^T * F - I)
 	Eigen::Matrix2f epsilon;
-	epsilon(0,0) = 0.5f*(F(0,0) * F(0,0) + F(1,0) * F(1,0) + F(2,0) * F(2,0) - 1.0f);		// xx
-	epsilon(1,1) = 0.5f*(F(0,1) * F(0,1) + F(1,1) * F(1,1) + F(2,1) * F(2,1) - 1.0f);		// yy
-	epsilon(0,1) = 0.5f*(F(0,0) * F(0,1) + F(1,0) * F(1,1) + F(2,0) * F(2,1));			// xy
-	epsilon(1,0) = epsilon(0,1);
+	epsilon = 0.5 * (F.transpose() * F - Eigen::Matrix2f::Identity());
+	//epsilon(0,0) = 0.5f*(F(0,0) * F(0,0) + F(1,0) * F(1,0) + F(2,0) * F(2,0) - 1.0f);		// xx
+	//epsilon(1,1) = 0.5f*(F(0,1) * F(0,1) + F(1,1) * F(1,1) + F(2,1) * F(2,1) - 1.0f);		// yy
+	//epsilon(0,1) = 0.5f*(F(0,0) * F(0,1) + F(1,0) * F(1,1) + F(2,0) * F(2,1));			// xy
+	//epsilon(1,0) = epsilon(0,1);
 
 	// P(F) = det(F) * C*E * F^-T => E = green strain
 	Eigen::Matrix2f stress;
-	stress(0,0) = C(0,0) * epsilon(0,0) + C(0,1) * epsilon(1,1) + C(0,2) * epsilon(0,1);
-	stress(1,1) = C(1,0) * epsilon(0,0) + C(1,1) * epsilon(1,1) + C(1,2) * epsilon(0,1);
-	stress(0,1) = C(2,0) * epsilon(0,0) + C(2,1) * epsilon(1,1) + C(2,2) * epsilon(0,1);
-	stress(1,0) = stress(0,1);
+	stress(0,0) = C(0,0) * epsilon(0,0) + C(0,1) * epsilon(1,1);
+	stress(1,1) = C(1,0) * epsilon(0,0) + C(1,1) * epsilon(1,1);
+	stress(0,1) = C(2,2) * epsilon(0,1);
+	stress(1,0) = C(2,2) * epsilon(1,0);
+	//stress(0,0) = C(0,0) * epsilon(0,0) + C(0,1) * epsilon(1,1) + C(0,2) * epsilon(0,1);
+	//stress(1,1) = C(1,0) * epsilon(0,0) + C(1,1) * epsilon(1,1) + C(1,2) * epsilon(0,1);
+	//stress(0,1) = C(2,0) * epsilon(0,0) + C(2,1) * epsilon(1,1) + C(2,2) * epsilon(0,1);
+	//stress(1,0) = stress(0,1);
 
-	const Eigen::Matrix<float, 3, 2> piolaKirchhoffStres = F * stress;
+	const Eigen::Matrix<float, 3, 2> piolaKirchhoffStress = F * stress;
 
+	// energy density
+	/* psi = 0.5 * tr[strain^T * stress]
+	 */
 	float psi = 0.0f;
-	for (unsigned char j = 0; j < 2; j++)
-		for (unsigned char k = 0; k < 2; k++)
-			psi += epsilon(j,k) * stress(j,k);
-	psi = 0.5f*psi;
+	psi = 0.5f * (epsilon.transpose() * stress).trace();
+	//for (unsigned char j = 0; j < 2; j++)
+	//	for (unsigned char k = 0; k < 2; k++)
+	//		psi += epsilon(j,k) * stress(j,k);
+	//psi = 0.5f*psi;
 	float energy = area*psi;
 
 	// compute gradient
-	Eigen::Matrix<float, 3, 2> H = area * piolaKirchhoffStres * invRestMat.transpose();
+	/* Position-based simulation of continuous materials chapter 4.3
+	 * H = [\partial energy / \partial x_i] = A*P(F)*D_m^-T
+	 * gradC[i] = \partial energy / \partial x_i
+	 */
+	Eigen::Matrix<float, 3, 2> H = area * piolaKirchhoffStress * invRestMat.transpose();
 	Eigen::Vector3f gradC[3];
-	for (unsigned char j = 0; j < 3; ++j)
-	{
-		gradC[0][j] = H(j,0);
-		gradC[1][j] = H(j,1);
-	}
+	gradC[0] = H.block<3, 1>(0, 0);
+	gradC[1] = H.block<3, 1>(0, 1);
+	//for (unsigned char j = 0; j < 3; ++j)
+	//{
+	//	gradC[0][j] = H(j,0);
+	//	gradC[1][j] = H(j,1);
+	//}
 	gradC[2] = -gradC[0] - gradC[1];
 
-
 	float sum_normGradC = invMass0 * gradC[0].squaredNorm();
-	sum_normGradC += invMass1 * gradC[1].squaredNorm();
-	sum_normGradC += invMass2 * gradC[2].squaredNorm();
+						+ invMass1 * gradC[1].squaredNorm();
+						+ invMass2 * gradC[2].squaredNorm();
 
 	// exit early if required
 	if (fabs(sum_normGradC) > eps)
