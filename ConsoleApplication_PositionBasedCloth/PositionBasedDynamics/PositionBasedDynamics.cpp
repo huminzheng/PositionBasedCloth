@@ -967,8 +967,8 @@ bool PositionBasedDynamics::solve_FEMTriangleConstraint(
 	//}
 	gradC[2] = -gradC[0] - gradC[1];
 
-	float sum_normGradC = invMass0 * gradC[0].squaredNorm();
-						+ invMass1 * gradC[1].squaredNorm();
+	float sum_normGradC = invMass0 * gradC[0].squaredNorm()
+						+ invMass1 * gradC[1].squaredNorm()
 						+ invMass2 * gradC[2].squaredNorm();
 
 	// exit early if required
