@@ -43,7 +43,7 @@ private:
 	std::list<Constraint *> m_permanentConstraints;
 	std::list<Constraint *> m_temporaryConstraints;
 
-	unsigned int m_iterCount = 8;
+	//unsigned int m_iterCount = 8;
 
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_lastPositions;
 	SurfaceMesh3f::Property_map<Veridx, Eigen::Vector3f> m_currentPositions;

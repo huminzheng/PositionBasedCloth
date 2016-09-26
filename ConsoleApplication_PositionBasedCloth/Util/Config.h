@@ -29,6 +29,8 @@ public:
 	float ProjectIsometricBendingStiff;
 	float ProjectFEMTriangleStiff;
 
+	float IterCount;
+
 };
 
 class Config
@@ -89,7 +91,9 @@ private:
 		this->parameters->ProjectDistanceStiff = params.FindMember("ProjectDistanceStiff")->value.GetFloat();
 		this->parameters->ProjectIsometricBendingStiff = params.FindMember("ProjectIsometricBendingStiff")->value.GetFloat();
 		this->parameters->ProjectFEMTriangleStiff = params.FindMember("ProjectFEMTriangleStiff")->value.GetFloat();
-	
+
+		this->parameters->IterCount = params.FindMember("FrameIterationCount")->value.GetInt();
+
 	}
 	
 };

@@ -28,16 +28,17 @@
   "ParamGroup": "PBDParameters",
 
   "PBDParameters": {
-    "YoungModulo_xx": 1.0,
-    "YoungModulo_yy": 1.0,
-    "YoungModulo_xy": 1.0,
+    "YoungModulo_xx": 0.99,
+    "YoungModulo_yy": 0.99,
+    "YoungModulo_xy": 0.99,
     "PoissonRation_xy": 0.1,
     "PoissonRation_yx": 0.1,
     "IsometricBendingStiff": 0.1,
     "ClothThickness": 0.15,
     "ProjectDistanceStiff": 0.8,
     "ProjectIsometricBendingStiff": 0.8,
-    "ProjectFEMTriangleStiff": 0.8
+    "ProjectFEMTriangleStiff": 0.8,
+    "FrameIterationCount": 6
   }
 
 

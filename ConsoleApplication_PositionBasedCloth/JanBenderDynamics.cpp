@@ -259,9 +259,9 @@ void JanBenderDynamics::stepforward(float timeStep)
 #ifdef USE_COLLISION_CONSTRAINTS
  	genCollConstraints();
 #endif
-	for (unsigned int _i = 0; _i < m_iterCount; ++_i)
+	for (unsigned int _i = 0; _i < m_params->IterCount; ++_i)
 	{
-		projectConstraints(m_iterCount);
+		projectConstraints(m_params->IterCount);
 	}
 	updateStates(timeStep);
 #ifdef USE_VELOCITY_CONSTRAINTS
