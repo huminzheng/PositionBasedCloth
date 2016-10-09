@@ -1,5 +1,5 @@
 {
-  "PathGroup": "ClothMan",
+  "PathGroup": "TShirtWoman",
 
   "BracesSkirt": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\BracesSkirt.obj",
@@ -23,6 +23,12 @@
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\VestChanged.obj",
     "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\Matrix.txt",
     "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\ModelForAlign\\ModelForAlign\\TaggedManTest.obj"
+  },
+
+  "TShirtWoman": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TShirt\\Cloth.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TShirt\\Matrix.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TShirt\\Model.obj"
   },
 
   "ParamGroup": "PBDParameters",
