@@ -40,6 +40,7 @@
     <ClCompile Include="Util\BasicOperations.cpp" />
     <ClCompile Include="Util\BasicTypes.cpp" />
     <ClCompile Include="Util\Geometry.cpp" />
+    <ClCompile Include="Util\Profile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AABBTree\AABBox.h" />
@@ -70,6 +71,7 @@
     <ClInclude Include="Util\Clock.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Geometry.h" />
+    <ClInclude Include="Util\Profile.h" />
     <ClInclude Include="Util\Test.h" />
   </ItemGroup>
   <ItemGroup>

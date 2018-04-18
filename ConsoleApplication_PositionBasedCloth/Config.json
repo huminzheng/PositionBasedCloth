@@ -1,5 +1,5 @@
 {
-  "PathGroup": "TShirtWoman",
+  "PathGroup": "TShirtManForCompare",
 
   "BracesSkirt": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\BracesSkirt.obj",
@@ -31,6 +31,12 @@
     "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\TShirt\\Model.obj"
   },
 
+  "TShirtManForCompare": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Shirt_8k.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Matrix.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Man.obj"
+  },
+
   "ParamGroup": "PBDParameters",
 
   "PBDParameters": {
@@ -41,7 +47,7 @@
     "PoissonRation_yx": 0.1,
     "IsometricBendingStiff": 0.1,
     "ClothThickness": 0.15,
-    "ProjectDistanceStiff": 0.8,
+    "ProjectDistanceStiff": 0.1,
     "ProjectIsometricBendingStiff": 0.8,
     "ProjectFEMTriangleStiff": 0.8,
     "FrameIterationCount": 6

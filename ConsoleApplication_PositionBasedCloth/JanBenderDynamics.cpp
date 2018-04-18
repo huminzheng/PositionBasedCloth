@@ -1,6 +1,7 @@
 #include "JanBenderDynamics.h"
 #include "Util\BasicOperations.h"
 #include "Util\Geometry.h"
+#include "Util\Profile.h"
 #include "AABBTree\SpatialHashing.h"
 
 #include "PositionBasedDynamics\PositionBasedDynamics.h"
@@ -22,6 +23,28 @@
 //#define USE_SELF_COLLISION
 #define USE_RIGIDBODY_COLLISION
 
+namespace
+{
+	static const std::string profileFile = "E:/Microsoft Visual Studio 2015/Workspace/ConsoleApplication_PositionBasedCloth/log/LogFile.txt";
+
+	void ProfileNewFrame()
+	{
+		std::ofstream outfile;
+		outfile.open(profileFile, std::ios_base::app);
+		outfile << std::endl;
+	}
+
+	void ProfileResult(const ScopedProfiler::TimeCount start, const ScopedProfiler::TimeCount end)
+	{
+		std::ofstream outfile;
+		outfile.open(profileFile, std::ios_base::app);
+		outfile << std::to_string(end - start) << ", ";
+	}
+}
+
+#define PROFILE_SCOPE							\
+	ScopedProfiler profiler(ProfileResult);		\
+	(profiler);
 
 void JanBenderDynamics::initial(float density)
 {
@@ -238,6 +261,9 @@ void JanBenderDynamics::userSet()
 void JanBenderDynamics::stepforward(float timeStep)
 {
 	std::cout << " ------------ new step ------------ " << std::endl;
+
+	ProfileNewFrame();
+	
 	m_temporaryConstraints.clear();
 
 	//for (auto vid : m_clothPiece->getMesh()->vertices())
@@ -247,7 +273,10 @@ void JanBenderDynamics::stepforward(float timeStep)
 	//		std::cout << "offset invalid at " << vid << std::endl;
 	//}
 	
-	freeForward(timeStep);
+	{
+		PROFILE_SCOPE;
+		freeForward(timeStep);
+	}
 	
 	//for (auto vid : m_clothPiece->getMesh()->vertices())
 	//{
@@ -256,14 +285,24 @@ void JanBenderDynamics::stepforward(float timeStep)
 	//		std::cout << "offset invalid at " << vid << std::endl;
 	//}
 
-#ifdef USE_COLLISION_CONSTRAINTS
- 	genCollConstraints();
-#endif
-	for (unsigned int _i = 0; _i < m_params->IterCount; ++_i)
 	{
-		projectConstraints(m_params->IterCount);
+		PROFILE_SCOPE;
+
+#ifdef USE_COLLISION_CONSTRAINTS
+		genCollConstraints();
+#endif
 	}
-	updateStates(timeStep);
+
+		//for (unsigned int _i = 0; _i < m_params->IterCount; ++_i)
+		{
+			projectConstraints(m_params->IterCount);
+		}
+
+	{
+		PROFILE_SCOPE;
+		updateStates(timeStep);
+	}
+
 #ifdef USE_VELOCITY_CONSTRAINTS
 	velocityUpdate();
 #endif
@@ -495,36 +534,51 @@ void JanBenderDynamics::genCollConstraints()
 void JanBenderDynamics::projectConstraints(int iterCount)
 {
 	//if (m_temporaryConstraints.empty())
-	for (auto cons : m_permanentConstraints)
 	{
-		//cons->updateConstraint();
-		//cons->solvePositionConstraint();
-		//continue;
-		switch (cons->getTypeId())
+		PROFILE_SCOPE;
+
+		for (int iterNo = 0; iterNo < iterCount; ++iterNo)
 		{
-		case ConstraintType::DistanceConstraint_Type:
-			cons->updateConstraint();
-			cons->solvePositionConstraint(std::pow(m_params->ProjectDistanceStiff, 1.0f / iterCount));
-			break;
-		case ConstraintType::IsometricBendingConstraint_Type:
-			cons->updateConstraint();
-			cons->solvePositionConstraint(std::pow(m_params->ProjectIsometricBendingStiff, 1.0f / iterCount));
-			break;
-		case ConstraintType::FEMTriangleConstraint_Type:
-			//std::cout << "FEMTriangleConstraint_Type" << std::endl;
-			cons->updateConstraint();
-			cons->solvePositionConstraint(std::pow(m_params->ProjectFEMTriangleStiff, 1.0f / iterCount));
-			break;
-		default:
-			break;
+			for (auto cons : m_permanentConstraints)
+			{
+				//cons->updateConstraint();
+				//cons->solvePositionConstraint();
+				//continue;
+				switch (cons->getTypeId())
+				{
+				case ConstraintType::DistanceConstraint_Type:
+					cons->updateConstraint();
+					cons->solvePositionConstraint(m_params->ProjectDistanceStiff);
+					//cons->solvePositionConstraint(std::pow(m_params->ProjectDistanceStiff, 1.0f / iterCount));
+					break;
+				case ConstraintType::IsometricBendingConstraint_Type:
+					cons->updateConstraint();
+					cons->solvePositionConstraint(m_params->ProjectIsometricBendingStiff);
+					//cons->solvePositionConstraint(std::pow(m_params->ProjectIsometricBendingStiff, 1.0f / iterCount));
+					break;
+				case ConstraintType::FEMTriangleConstraint_Type:
+					//std::cout << "FEMTriangleConstraint_Type" << std::endl;
+					cons->updateConstraint();
+					cons->solvePositionConstraint(m_params->ProjectFEMTriangleStiff);
+					//cons->solvePositionConstraint(std::pow(m_params->ProjectFEMTriangleStiff, 1.0f / iterCount));
+					break;
+				default:
+					break;
+				}
+			}
 		}
 	}
-	for (int _i = 0; _i < 5; ++_i)
+
 	{
-		for (auto cons : m_temporaryConstraints)
+		PROFILE_SCOPE;
+
+		for (int iterNo = 0; iterNo < iterCount; ++iterNo)
 		{
-			cons->updateConstraint();
- 			cons->solvePositionConstraint();
+			for (auto cons : m_temporaryConstraints)
+			{
+				cons->updateConstraint();
+				cons->solvePositionConstraint();
+			}
 		}
 	}
 }
@@ -535,7 +589,7 @@ void JanBenderDynamics::updateStates(float timeStep)
 	//if (m_temporaryConstraints.empty())
 	for (auto vid : m_clothPiece->getMesh()->vertices())
 	{
-		m_vertexVelocities[vid] = 0.98f * invTimeStep * (m_predictPositions[vid] - m_currentPositions[vid]);
+		m_vertexVelocities[vid] = /*0.98f * */invTimeStep * (m_predictPositions[vid] - m_currentPositions[vid]);
 		m_lastPositions[vid] = m_currentPositions[vid];
 		m_currentPositions[vid] = m_predictPositions[vid];
 	}
