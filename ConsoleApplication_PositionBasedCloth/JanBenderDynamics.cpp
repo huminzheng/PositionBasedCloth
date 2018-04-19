@@ -38,7 +38,7 @@ namespace
 	{
 		std::ofstream outfile;
 		outfile.open(profileFile, std::ios_base::app);
-		outfile << std::to_string(end - start) << ", ";
+		outfile << std::to_string(double(end - start) / 1000000.0) << ", ";
 	}
 }
 
@@ -263,7 +263,7 @@ void JanBenderDynamics::stepforward(float timeStep)
 	std::cout << " ------------ new step ------------ " << std::endl;
 
 	ProfileNewFrame();
-	
+
 	m_temporaryConstraints.clear();
 
 	//for (auto vid : m_clothPiece->getMesh()->vertices())
@@ -272,12 +272,12 @@ void JanBenderDynamics::stepforward(float timeStep)
 	//	if (offset.squaredNorm() > 1e-20)
 	//		std::cout << "offset invalid at " << vid << std::endl;
 	//}
-	
+
 	{
 		PROFILE_SCOPE;
 		freeForward(timeStep);
 	}
-	
+
 	//for (auto vid : m_clothPiece->getMesh()->vertices())
 	//{
 	//	Eigen::Vector3f offset = m_predictPositions[vid] - m_currentPositions[vid];
@@ -293,10 +293,10 @@ void JanBenderDynamics::stepforward(float timeStep)
 #endif
 	}
 
-		//for (unsigned int _i = 0; _i < m_params->IterCount; ++_i)
-		{
-			projectConstraints(m_params->IterCount);
-		}
+	//for (unsigned int _i = 0; _i < m_params->IterCount; ++_i)
+	{
+		projectConstraints(m_params->IterCount);
+	}
 
 	{
 		PROFILE_SCOPE;
@@ -593,6 +593,24 @@ void JanBenderDynamics::updateStates(float timeStep)
 		m_lastPositions[vid] = m_currentPositions[vid];
 		m_currentPositions[vid] = m_predictPositions[vid];
 	}
+
+#define FIXED_ANCHOR_POINT
+
+#ifdef FIXED_ANCHOR_POINT
+	{
+		auto iter = m_clothPiece->getMesh()->vertices_begin();
+		Veridx vid = *iter++;
+		m_vertexVelocities[vid] = Eigen::Vector3f(0.0f, 0.0f, 1.0f);
+		m_predictPositions[vid] = m_currentPositions[vid];
+		m_currentPositions[vid] = m_lastPositions[vid];
+
+		for (size_t _i = 0; _i < 58; ++_i, ++iter);
+		vid = *iter++;
+		m_vertexVelocities[vid] = Eigen::Vector3f(0.0f, 0.0f, 1.0f);
+		m_predictPositions[vid] = m_currentPositions[vid];
+		m_currentPositions[vid] = m_lastPositions[vid];
+	}
+#endif
 }
 
 void JanBenderDynamics::velocityUpdate()

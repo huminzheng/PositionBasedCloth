@@ -39,6 +39,7 @@
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Util\BasicOperations.cpp" />
     <ClCompile Include="Util\BasicTypes.cpp" />
+    <ClCompile Include="Util\Clock.cpp" />
     <ClCompile Include="Util\Geometry.cpp" />
     <ClCompile Include="Util\Profile.cpp" />
   </ItemGroup>

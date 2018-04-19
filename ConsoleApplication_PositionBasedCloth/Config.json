@@ -1,5 +1,5 @@
 {
-  "PathGroup": "TShirtManForCompare",
+  "PathGroup": "SquareForCompare",
 
   "BracesSkirt": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Xiong\\BracesSkirt\\BracesSkirt\\BracesSkirt.obj",
@@ -34,6 +34,12 @@
   "TShirtManForCompare": {
     "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Shirt_8k.obj",
     "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Matrix.txt",
+    "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Man.obj"
+  },
+
+  "SquareForCompare": {
+    "ClothModelPath": "E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\SquareCloth_30m30\\Clothes.obj",
+    "ClothMatrixPath": "E:\\Computer Graphics\\Materials\\Models\\Basic Geometries\\SquareCloth_20m20\\Matrix.txt",
     "RigidBodyModelPath": "E:\\Computer Graphics\\Materials\\Models\\ComplexScenes\\Scene_ClothMan02\\Man.obj"
   },
 

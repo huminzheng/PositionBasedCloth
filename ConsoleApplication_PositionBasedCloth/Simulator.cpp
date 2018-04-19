@@ -5,17 +5,18 @@
 #include "Util\Config.h"
 #include "Render\EventManager.h"
 
-#define USE_RIGIDBODY
+//#define USE_RIGIDBODY
 
 void Simulator::run()
 {
 	while (!Screen::closed())
 	{
+		Clock::Instance()->Tick(1.0f);
 		{
 			EventManager::active(eventManager);
 			Screen::pullEvents();
 			eventManager->handleEvents();
-			if (!clock->paused())
+			if (!Clock::Instance()->paused())
 			{
 				updateData();
 			}
@@ -108,6 +109,13 @@ void Simulator::init()
 	// ------------ register event handlers ------------
 	eventManager = new EventManager(Screen::window);
 	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {this->viewer->keyboard_press(keyMask); });
+	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {
+		if (keyMask[GLFW_KEY_C])
+		{
+			Clock::Instance()->resume();
+			Clock::Instance()->PushFrameCounter(new FrameCounter(40, []() { Clock::Instance()->pause(); }));
+		}
+	});
 	eventManager->registerMouseEventHandler([this](GLfloat xpos, GLfloat ypos, GLfloat xlast, GLfloat ylast) -> void {this->viewer->move_mouse(xpos, ypos, xlast, ylast); });
 	eventManager->registerScrollEventHandler([this](GLfloat scrollX, GLfloat scrollY) -> void {this->viewer->scroll_mouse(scrollX, scrollY); });
 	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {this->pauseEventHandle(keyMask); });
