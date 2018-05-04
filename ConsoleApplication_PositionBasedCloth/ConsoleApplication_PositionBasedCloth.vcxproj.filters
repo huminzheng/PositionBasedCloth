@@ -262,5 +262,11 @@
     <None Include="Config.json">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="GLSL\cloth_frag.glsl">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
+    <None Include="GLSL\cloth_vs.glsl">
+      <Filter>Resource Files\GLSL</Filter>
+    </None>
   </ItemGroup>
 </Project>

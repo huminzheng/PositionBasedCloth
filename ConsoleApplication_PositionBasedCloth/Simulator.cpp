@@ -41,6 +41,7 @@ void Simulator::init()
 	ResourceManager::LoadShader("cloth_piece_normal", ".\\GLSL\\cloth_piece_debug.vs", ".\\GLSL\\cloth_piece_debug.frag", ".\\GLSL\\cloth_piece_debug.gs");
 	ResourceManager::LoadShader("bounding_box", ".\\GLSL\\bounding_box.vs", ".\\GLSL\\bounding_box.frag", ".\\GLSL\\bounding_box.gs");
 	ResourceManager::LoadShader("contact_point", ".\\GLSL\\contact_point.vs", ".\\GLSL\\contact_point.frag");
+	ResourceManager::LoadShader("cloth", ".\\GLSL\\cloth_vs.glsl", ".\\GLSL\\cloth_frag.glsl");
 	//ResourceManager::LoadShader("model_loading", ".\\model_loading.vs", ".\\model_loading.frag");
 	//ResourceManager::LoadShader("background_cube", ".\\background_cube.vs", ".\\background_cube.frag");
 	
@@ -69,7 +70,7 @@ void Simulator::init()
 	//	ResourceManager::GetCubeMap("background_texture"), viewer->getCamera());
 	//Scene::add_component(env);
 
-	auto clo = new SceneClothPiece(ResourceManager::GetShader("cloth_piece"),
+	auto clo = new SceneClothPiece(ResourceManager::GetShader("cloth"),
 		ResourceManager::GetShader("cloth_piece_normal"),
 		clothPiece, viewer->getCamera());
 	Scene::add_component(clo);

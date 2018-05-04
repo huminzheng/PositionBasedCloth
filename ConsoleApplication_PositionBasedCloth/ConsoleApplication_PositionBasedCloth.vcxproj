@@ -82,11 +82,13 @@
     <None Include="GLSL\bounding_box.frag" />
     <None Include="GLSL\bounding_box.gs" />
     <None Include="GLSL\bounding_box.vs" />
+    <None Include="GLSL\cloth_frag.glsl" />
     <None Include="GLSL\cloth_piece.frag" />
     <None Include="GLSL\cloth_piece.vs" />
     <None Include="GLSL\cloth_piece_debug.frag" />
     <None Include="GLSL\cloth_piece_debug.gs" />
     <None Include="GLSL\cloth_piece_debug.vs" />
+    <None Include="GLSL\cloth_vs.glsl" />
     <None Include="GLSL\contact_point.frag" />
     <None Include="GLSL\contact_point.vs" />
     <None Include="GLSL\model_loading.frag" />
