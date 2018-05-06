@@ -73,6 +73,7 @@
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Geometry.h" />
     <ClInclude Include="Util\Profile.h" />
+    <ClInclude Include="Util\Singleton.h" />
     <ClInclude Include="Util\Test.h" />
   </ItemGroup>
   <ItemGroup>

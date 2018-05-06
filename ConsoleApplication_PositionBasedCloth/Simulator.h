@@ -11,9 +11,8 @@ class Simulator
 {
 public:
 
-	explicit Simulator():
-		viewer(new FOVControl(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f)),
-		clock(new Clock(true))
+	Simulator()
+		: viewer(new FOVControl(glm::vec3(0.0f, 0.0f, -10.0f), glm::vec3(0.0f, 1.0f, 0.0f), 90.0f))
 	{} 
 
 	// WARNING: should be called explicitly
@@ -32,12 +31,8 @@ private:
 
 	EventManager * eventManager;
 	FOVControl * viewer;
-	Clock * clock;
 
-	GLuint loopCount;
-	Scene::Index contactSceneIndex;
-
-	void updateData();
+	void simulateInternal();
 
 	void pauseEventHandle(bool const * const keyMask);
 

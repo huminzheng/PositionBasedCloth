@@ -5,7 +5,7 @@
 #include "Util\Config.h"
 #include "Render\EventManager.h"
 
-//#define USE_RIGIDBODY
+#define USE_RIGIDBODY
 
 void Simulator::run()
 {
@@ -18,7 +18,7 @@ void Simulator::run()
 			eventManager->handleEvents();
 			if (!Clock::Instance()->paused())
 			{
-				updateData();
+				simulateInternal();
 			}
 		}
 		Scene::renderScene();
@@ -29,11 +29,11 @@ void Simulator::run()
 void Simulator::init()
 {
 	Screen::initEnv();
-	loopCount = 0u;
 
 	config = new Config(".\\Config.json");
 
-	// ---------- Setup and compile our shaders -------------------
+	//////////////////////////////////////////////////////////////////////////
+	// load shaders
 	ResourceManager::LoadShader("model_loading", ".\\GLSL\\model_loading.vs", ".\\GLSL\\model_loading.frag");
 	ResourceManager::LoadShader("background_cube", ".\\GLSL\\background_cube.vs", ".\\GLSL\\background_cube.frag");
 	ResourceManager::LoadShader("cloth_piece", ".\\GLSL\\cloth_piece.vs", ".\\GLSL\\cloth_piece.frag");
@@ -42,72 +42,59 @@ void Simulator::init()
 	ResourceManager::LoadShader("bounding_box", ".\\GLSL\\bounding_box.vs", ".\\GLSL\\bounding_box.frag", ".\\GLSL\\bounding_box.gs");
 	ResourceManager::LoadShader("contact_point", ".\\GLSL\\contact_point.vs", ".\\GLSL\\contact_point.frag");
 	ResourceManager::LoadShader("cloth", ".\\GLSL\\cloth_vs.glsl", ".\\GLSL\\cloth_frag.glsl");
-	//ResourceManager::LoadShader("model_loading", ".\\model_loading.vs", ".\\model_loading.frag");
-	//ResourceManager::LoadShader("background_cube", ".\\background_cube.vs", ".\\background_cube.frag");
-	
-	// ----------- load cube map ----------------
-	//std::vector<const GLchar*> faces;
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\side.jpg");
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\side.jpg");
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\top.jpg");
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\bottom.jpg");
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\side.jpg");
-	//faces.push_back("E:\\Computer Graphics\\Materials\\CubeMaps\\background01\\side.jpg");
-	//ResourceManager::LoadCubeMap("background_texture", faces);
 
-	// ----------- Load cloth model ----------------
-	Model ourModel((GLchar *)config->modelPath.c_str(), 
+	//////////////////////////////////////////////////////////////////////////
+	// load models
+	Model clothModel((GLchar *)config->modelPath.c_str(), 
 		aiPostProcessSteps(aiProcess_Triangulate | /*aiProcess_FlipUVs | */aiProcess_JoinIdenticalVertices | aiProcess_RemoveComponent),
 		aiComponent(aiComponent_NORMALS));
 
-	std::array<float, 16> matdata = readData<float, 16>((GLchar *)config->matrixPath.c_str());
-	
-	clothPiece = new SurfaceMeshObject(3);
-	clothPiece->import(ourModel.getMeshes()[0], matdata);
-	clothPiece->refreshNormals();
-
-	//auto env = new SceneEnv(ResourceManager::GetShader("background_cube"),
-	//	ResourceManager::GetCubeMap("background_texture"), viewer->getCamera());
-	//Scene::add_component(env);
-
-	auto clo = new SceneClothPiece(ResourceManager::GetShader("cloth"),
-		ResourceManager::GetShader("cloth_piece_normal"),
-		clothPiece, viewer->getCamera());
-	Scene::add_component(clo);
-	//clothPieceBoxSceneIndex = Scene::add_component(new SceneAABBox(ResourceManager::GetShader("bounding_box"),
-	//	viewer->getCamera()));
-
-	// ----------- Load rigid model ----------------
-#ifdef USE_RIGIDBODY
 	Model rigidBodyModel(
 		(GLchar *)config->rigidBodyPath.c_str(),
-		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices), 
+		aiPostProcessSteps(aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices),
 		aiComponent(0x00));
+
+	//////////////////////////////////////////////////////////////////////////
+	// load cloth
+	std::array<float, 16> matdata = readData<float, 16>((GLchar *)config->matrixPath.c_str());
+	
+	//////////////////////////////////////////////////////////////////////////
+	// create cloth
+	clothPiece = new SurfaceMeshObject(3);
+	clothPiece->import(clothModel.getMeshes()[0], matdata);
+	clothPiece->refreshNormals();
+
+	Scene::add_component(new SceneClothPiece(
+		ResourceManager::GetShader("cloth"),
+		ResourceManager::GetShader("cloth_piece_normal"),
+		clothPiece, viewer->getCamera()));
+
+	//////////////////////////////////////////////////////////////////////////
+	// create rigid body
+#ifdef USE_RIGIDBODY
 	rigidBody = new SurfaceMeshObject(3);
 	rigidBody->import(rigidBodyModel.getMeshes()[0]);
 	rigidBody->refreshNormals();
 
-
-	auto sph = new SceneRigidBody(ResourceManager::GetShader("rigid_body"),
-		rigidBody, viewer->getCamera());
-	Scene::add_component(sph);
-
-	contactSceneIndex = Scene::add_component(new SceneContact(
-		ResourceManager::GetShader("bounding_box"), ResourceManager::GetShader("contact_point"),
+	Scene::add_component(new SceneRigidBody(
+		ResourceManager::GetShader("rigid_body"),
+		rigidBody, 
 		viewer->getCamera()));
 #endif
 
-
-	// ----------- Load dynamics ----------------
+	//////////////////////////////////////////////////////////////////////////
+	// create simulate dynamics
 	jbDynamics = new JanBenderDynamics(clothPiece, config->parameters);
 #ifdef USE_RIGIDBODY
 	jbDynamics->addRigidBody(rigidBody);
 #endif	
 
-	// ----------- Load scene ----------------
+	//////////////////////////////////////////////////////////////////////////
+	// load scene
 	Scene::load();
 
-	// ------------ register event handlers ------------
+	//////////////////////////////////////////////////////////////////////////
+	// input system
 	eventManager = new EventManager(Screen::window);
 	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {this->viewer->keyboard_press(keyMask); });
 	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {
@@ -120,12 +107,10 @@ void Simulator::init()
 	eventManager->registerMouseEventHandler([this](GLfloat xpos, GLfloat ypos, GLfloat xlast, GLfloat ylast) -> void {this->viewer->move_mouse(xpos, ypos, xlast, ylast); });
 	eventManager->registerScrollEventHandler([this](GLfloat scrollX, GLfloat scrollY) -> void {this->viewer->scroll_mouse(scrollX, scrollY); });
 	eventManager->registerKeyboardEventHandler([this](bool const * const keyMask) -> void {this->pauseEventHandle(keyMask); });
-
 }
 
-void Simulator::updateData()
+void Simulator::simulateInternal()
 {
-	
 	jbDynamics->userSet();
 	jbDynamics->stepforward(0.1f);
 
@@ -133,24 +118,16 @@ void Simulator::updateData()
 	GLuint * typeBuffer = nullptr;
 	GLuint size = 0;
 	jbDynamics->exportCollisionVertices(buffer, typeBuffer, size);
-
-	//contactHandler = new OtaduyContact(clothPiece, rigidBody);
-	//contactHandler->pointTriangleDetection(0.1f);
-	//contactHandler->edgeEdgeDetection(0.1f);
-#ifdef USE_RIGIDBODY
-	(dynamic_cast<SceneContact *>(Scene::get_component(contactSceneIndex)))
-		->setContacts(buffer, typeBuffer, size);
-#endif
 }
 
 void Simulator::pauseEventHandle(bool const * const keyMask)
 {
 	if (keyMask[GLFW_KEY_Z])
 	{
-		clock->pause();
+		Clock::Instance()->pause();
 	}
 	if (keyMask[GLFW_KEY_X])
 	{
-		clock->resume();
+		Clock::Instance()->resume();
 	}
 }

@@ -209,6 +209,9 @@
     <ClInclude Include="Util\Profile.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Singleton.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GLSL\background_cube.frag">

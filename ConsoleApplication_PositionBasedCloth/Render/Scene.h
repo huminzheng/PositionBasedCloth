@@ -34,7 +34,7 @@ public:
 	}
 
 private:
-	explicit Scene() {}
+	Scene() {}
 
 	static std::vector<SceneComponent *> render_list;
 
